@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "apkdiff", "apkdiff.csproj", "{4E0D89AC-1C8A-45A8-94F0-A54D1B68BE9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|anycpu = Debug|anycpu
+		Release|anycpu = Release|anycpu
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E0D89AC-1C8A-45A8-94F0-A54D1B68BE9C}.Debug|anycpu.ActiveCfg = Debug|anycpu
+		{4E0D89AC-1C8A-45A8-94F0-A54D1B68BE9C}.Debug|anycpu.Build.0 = Debug|anycpu
+		{4E0D89AC-1C8A-45A8-94F0-A54D1B68BE9C}.Release|anycpu.ActiveCfg = Release|anycpu
+		{4E0D89AC-1C8A-45A8-94F0-A54D1B68BE9C}.Release|anycpu.Build.0 = Release|anycpu
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,12 @@
+*.userprefs
+*.user
+bin
+obj
+packages
+.DS_Store
+.nuget
+.vs/
+.vscode/
+.gradle/
+*.binlog
+*~
