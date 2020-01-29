@@ -22,7 +22,7 @@ namespace apkdiff {
 		[DataMember]
 		readonly Dictionary<string, FileInfo> Entries = new Dictionary<string, FileInfo> ();
 
-		public ApkDescription (string path)
+		public static ApkDescription Load (string path)
 		{
 			if (!File.Exists (path)) {
 				Program.Error ($"File '{path}' does not exist.");
@@ -32,15 +32,18 @@ namespace apkdiff {
 			var extension = Path.GetExtension (path);
 			switch (extension.ToLower ()) {
 			case ".apk":
-				LoadApk (path);
-				break;
+				var nd = new ApkDescription ();
+
+				nd.LoadApk (path);
+
+				return nd;
 			case ".apkdesc":
-				LoadDescription (path);
-				break;
+				return LoadDescription (path);
 			default:
 				Program.Error ($"Unknown file extension '{extension}'");
 				Environment.Exit (3);
-				break;
+
+				return null;
 			}
 		}
 
@@ -49,7 +52,7 @@ namespace apkdiff {
 			var zip = ZipArchive.Open (path, FileMode.Open);
 
 			if (Program.Verbose)
-				Program.ColorWriteLine ($"Loading {path}", ConsoleColor.Yellow);
+				Program.ColorWriteLine ($"Loading apk {path}", ConsoleColor.Yellow);
 
 			PackageSize = new System.IO.FileInfo (path).Length;
 			PackagePath = path;
@@ -71,9 +74,14 @@ namespace apkdiff {
 			SaveDescription (Path.ChangeExtension (path, ".apkdesc"));
 		}
 
-		void LoadDescription (string path)
+		static ApkDescription LoadDescription (string path)
 		{
+			if (Program.Verbose)
+				Program.ColorWriteLine ($"Loading description {path}", ConsoleColor.Yellow);
 
+			using (var reader = File.OpenText (path)) {
+				return new Newtonsoft.Json.JsonSerializer ().Deserialize (reader, typeof (ApkDescription)) as ApkDescription;
+			}
 		}
 
 		void SaveDescription (string path)

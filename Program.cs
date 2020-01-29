@@ -14,8 +14,8 @@ namespace apkdiff {
 		{
                         var (path1, path2) = ProcessArguments (args);
 
-                        var desc1 = new ApkDescription (path1);
-                        var desc2 = new ApkDescription (path2);
+                        var desc1 = ApkDescription.Load (path1);
+                        var desc2 = ApkDescription.Load (path2);
 
                         desc1.Compare (desc2);
                 }
