@@ -52,7 +52,7 @@ namespace apkdiff {
 			var zip = ZipArchive.Open (path, FileMode.Open);
 
 			if (Program.Verbose)
-				Program.ColorWriteLine ($"Loading apk {path}", ConsoleColor.Yellow);
+				Program.ColorWriteLine ($"Loading apk '{path}'", ConsoleColor.Yellow);
 
 			PackageSize = new System.IO.FileInfo (path).Length;
 			PackagePath = path;
@@ -71,13 +71,18 @@ namespace apkdiff {
 					Program.ColorWriteLine ($"  {entry.Size,12} {name}", ConsoleColor.Gray);
 			}
 
-			SaveDescription (Path.ChangeExtension (path, ".apkdesc"));
+			if (Program.SaveDescriptions) {
+				var descPath = Path.ChangeExtension (path, ".apkdesc");
+
+				Program.ColorWriteLine ($"Saving apk description to '{descPath}'", ConsoleColor.Yellow);
+				SaveDescription (descPath);
+			}
 		}
 
 		static ApkDescription LoadDescription (string path)
 		{
 			if (Program.Verbose)
-				Program.ColorWriteLine ($"Loading description {path}", ConsoleColor.Yellow);
+				Program.ColorWriteLine ($"Loading description '{path}'", ConsoleColor.Yellow);
 
 			using (var reader = File.OpenText (path)) {
 				return new Newtonsoft.Json.JsonSerializer ().Deserialize (reader, typeof (ApkDescription)) as ApkDescription;
@@ -91,7 +96,7 @@ namespace apkdiff {
 			}
 		}
 
-		void PrintDifference (string key, long diff, string comment=null)
+		void PrintDifference (string key, long diff, string comment = null)
 		{
 			var color = diff > 0 ? ConsoleColor.Red : ConsoleColor.Green;
 			Program.ColorWrite ($"  {diff:+;-;+}{Math.Abs (diff),12}", color);
