@@ -8,6 +8,7 @@ Compares APK packages content or APK package with content description
 Copyright 2020 Microsoft Corporation
 
 Options:
+  -c, --comment=VALUE        Comment to be saved inside .apkdesc file
   -h, --help, -?             Show this message and exit
   -s, --save-descriptions    Save .apkdesc files next to the apk package(s)
   -v, --verbose              Output information about progress during the run

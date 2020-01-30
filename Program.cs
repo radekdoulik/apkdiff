@@ -8,6 +8,7 @@ namespace apkdiff {
 	class Program {
 		static readonly string Name = "apkdiff";
 
+		public static string Comment;
 		public static bool SaveDescriptions;
 		public static bool Verbose;
 
@@ -35,6 +36,9 @@ namespace apkdiff {
 				"Copyright 2020 Microsoft Corporation",
 				"",
 				"Options:",
+				{ "c|comment=",
+					"Comment to be saved inside .apkdesc file",
+				  v => Comment = v },
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },

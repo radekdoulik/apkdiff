@@ -16,6 +16,9 @@ namespace apkdiff {
 	public class ApkDescription {
 
 		[DataMember]
+		string Comment;
+
+		[DataMember]
 		long PackageSize;
 		string PackagePath;
 
@@ -91,6 +94,8 @@ namespace apkdiff {
 
 		void SaveDescription (string path)
 		{
+			Comment = Program.Comment;
+
 			using (var writer = File.CreateText (path)) {
 				new Newtonsoft.Json.JsonSerializer () { Formatting = Newtonsoft.Json.Formatting.Indented }.Serialize (writer, this);
 			}
