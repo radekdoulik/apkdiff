@@ -28,7 +28,7 @@ namespace apkdiff {
 		{
 			var help = false;
 			var options = new OptionSet {
-				$"Usage: {Name}.exe OPTIONS* <package1.apk> <package2.apk>",
+				$"Usage: {Name}.exe OPTIONS* <package1.apk[desc]> [<package2.apk[desc]>]",
 				"",
 				"Compares APK packages content or APK package with content description",
 				"",
@@ -39,7 +39,7 @@ namespace apkdiff {
 					"Show this message and exit",
 				  v => help = v != null },
 				{ "s|save-descriptions",
-					"Output information about progress during the run of the tool",
+					"Save .apkdesc files next to the apk package(s)",
 				  v => SaveDescriptions = true },
 				{ "v|verbose",
 					"Output information about progress during the run of the tool",
