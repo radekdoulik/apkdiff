@@ -6,24 +6,6 @@
     <Version>0.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Mono.Posix.NETStandard">
-      <HintPath>packages\Mono.Posix.NETStandard.1.0.0\lib\net40\Mono.Posix.NETStandard.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Posix" />
-    <Reference Include="libZipSharp">
-      <HintPath>packages\Xamarin.LibZipSharp.1.0.8\lib\net45\libZipSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Options">
-      <HintPath>packages\Mono.Options.6.6.0.161\lib\net40\Mono.Options.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
