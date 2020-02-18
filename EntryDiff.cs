@@ -5,6 +5,8 @@ namespace apkdiff {
 		public static EntryDiff ForExtension (string extension)
 		{
 			switch (extension) {
+			case ".dll":
+				return new AssemblyDiff ();
 			case ".so":
 				return new SharedLibraryDiff ();
 			}
@@ -12,6 +14,6 @@ namespace apkdiff {
 			return null;
 		}
 
-		public abstract void Compare (string file, string other);
+		public abstract void Compare (string file, string other, string padding = null);
 	}
 }

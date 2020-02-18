@@ -179,7 +179,7 @@ namespace apkdiff {
 			var zipEntryOther = otherApk.Archive.ReadEntry (other.Key, true);
 			zipEntryOther.Extract (tmpDirOther, other.Key);
 
-			diff.Compare (Path.Combine (tmpDir, entry.Key), Path.Combine (tmpDirOther, other.Key));
+			diff.Compare (Path.Combine (tmpDir, entry.Key), Path.Combine (tmpDirOther, other.Key), "  ");
 
 			Directory.Delete (tmpDir, true);
 			Directory.Delete (tmpDirOther, true);

@@ -60,12 +60,12 @@ namespace apkdiff {
 			return symbols;
 		}
 
-		public override void Compare (string file, string other)
+		public override void Compare (string file, string other, string padding)
 		{
 			var sym1 = ParseNMOutput (RunNM (file));
 			var sym2 = ParseNMOutput (RunNM (other));
 
-			Program.ColorWriteLine ("                  Symbol size difference", ConsoleColor.Yellow);
+			Program.ColorWriteLine ($"{padding}                Symbol size difference", ConsoleColor.Yellow);
 
 			var differences = new Dictionary<string, long> ();
 			var singles = new HashSet<string> ();
@@ -96,7 +96,7 @@ namespace apkdiff {
 
 				var single = singles.Contains (diff.Key);
 
-				ApkDescription.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, "  ");
+				ApkDescription.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
 			}
 
 		}
