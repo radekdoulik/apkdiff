@@ -8,7 +8,7 @@ namespace apkdiff {
 		{
 		}
 
-		string RunNM (string file)
+		string RunCommand (string cmd, string arguments)
 		{
 			String output;
 
@@ -17,8 +17,8 @@ namespace apkdiff {
 				p.StartInfo.UseShellExecute = false;
 				p.StartInfo.RedirectStandardError = true;
 				p.StartInfo.RedirectStandardOutput = true;
-				p.StartInfo.FileName = "nm";
-				p.StartInfo.Arguments = $"-S --size-sort -D {file}";
+				p.StartInfo.FileName = cmd;
+				p.StartInfo.Arguments = arguments;
 
 				try {
 					p.Start ();
@@ -38,6 +38,28 @@ namespace apkdiff {
 			}
 
 			return output;
+		}
+
+		string HomeDir {
+			get {
+				return Environment.GetEnvironmentVariable ("HOME");
+			}
+		}
+
+		string AndroidToolsDir {
+			get {
+				return HomeDir + "/android-toolchain/toolchains/x86-clang/bin";
+			}
+		}
+
+		string RunNMCmd (string file)
+		{
+			return RunCommand ($"{AndroidToolsDir}/x86_64-linux-android-nm", $"-S --size-sort -D {file}");
+		}
+
+		string RunSizeCmd (string file)
+		{
+			return RunCommand ($"{AndroidToolsDir}/x86_64-linux-android-size", $"-A {file}");
 		}
 
 		struct SymbolInfo : ISizeProvider {
@@ -60,10 +82,77 @@ namespace apkdiff {
 			return symbols;
 		}
 
-		public override void Compare (string file, string other, string padding)
+		struct SectionInfo : ISizeProvider {
+			public long Size { get; set; }
+		}
+
+		Dictionary<string, SectionInfo> ParseSizeOutput (string output)
 		{
-			var sym1 = ParseNMOutput (RunNM (file));
-			var sym2 = ParseNMOutput (RunNM (other));
+			var sections = new Dictionary<string, SectionInfo> ();
+
+			int skipLines = 2;
+
+			foreach (var line in output.Split (new char [] { '\n' })) {
+				if (skipLines > 0) {
+					skipLines--;
+					continue;
+				}
+
+				var cols = line.Split (new char [] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+				if (cols.Length != 3)
+					continue;
+
+				sections [cols [0]] = new SectionInfo () { Size = int.Parse (cols [1]) };
+			}
+
+			return sections;
+		}
+
+		void CompareSections (string file, string other, string padding)
+		{
+			var scs1 = ParseSizeOutput (RunSizeCmd (file));
+			var scs2 = ParseSizeOutput (RunSizeCmd (other));
+
+			Program.ColorWriteLine ($"{padding}                Section size difference", ConsoleColor.Yellow);
+
+			var differences = new Dictionary<string, long> ();
+			var singles = new HashSet<string> ();
+
+			foreach (var entry in scs1) {
+				var key = entry.Key;
+
+				if (scs2.ContainsKey (key)) {
+					var otherEntry = scs2 [key];
+					differences [key] = otherEntry.Size - scs1 [key].Size;
+				} else {
+					differences [key] = -scs1 [key].Size;
+					singles.Add (key);
+				}
+			}
+
+			foreach (var key in scs2.Keys) {
+				if (scs1.ContainsKey (key))
+					continue;
+
+				differences [key] = scs2 [key].Size;
+				singles.Add (key);
+			}
+
+			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
+				if (diff.Value == 0)
+					continue;
+
+				var single = singles.Contains (diff.Key);
+
+				ApkDescription.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
+			}
+		}
+
+		void CompareSymbols (string file, string other, string padding)
+		{
+			var sym1 = ParseNMOutput (RunNMCmd (file));
+			var sym2 = ParseNMOutput (RunNMCmd (other));
 
 			Program.ColorWriteLine ($"{padding}                Symbol size difference", ConsoleColor.Yellow);
 
@@ -98,8 +187,12 @@ namespace apkdiff {
 
 				ApkDescription.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
 			}
-
 		}
 
+		public override void Compare (string file, string other, string padding)
+		{
+			CompareSections (file, other, padding);
+			CompareSymbols (file, other, padding);
+		}
 	}
 }
