@@ -105,3 +105,30 @@ Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
 Summary:
   +       45056 Package size difference
 ```
+### Shared libraries section sizes comparison example:
+```
+        Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
+          +      376724 lib/x86/libsqlite3_xamarin.so
+                          Section size difference
+            +      316967 .debug_loc
+            +       60924 .debug_info
+            +       15176 .debug_ranges
+            +        4038 .debug_line
+            +        1952 .debug_str
+            +         127 .debug_abbrev
+            +          44 .rodata
+            +          40 .eh_frame_hdr
+            +           8 .data.rel.ro
+            -           4 .eh_frame
+            -           4 .data
+            -           8 .gnu.version
+            -          12 .got.plt
+            -          16 .gnu.hash
+            -          16 .hash
+            -          24 .rel.plt
+            -          38 .dynstr
+            -          48 .plt
+            -          64 .dynsym
+            -          84 .comment
+            -       23984 .text
+```
