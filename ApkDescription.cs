@@ -217,7 +217,7 @@ namespace apkdiff {
 			foreach (var total in totalDifferences)
 				PrintDifference ($"{total.Key} ", total.Value.Difference, total.Value.OriginalTotal);
 
-			PrintDifference ("Package size difference", other.PackageSize - PackageSize);
+			PrintDifference ("Package size difference", other.PackageSize - PackageSize, PackageSize);
 		}
 
 		void CompareEntries (KeyValuePair<string, FileProperties> entry, KeyValuePair<string, FileProperties> other, ApkDescription otherApk, EntryDiff diff)
