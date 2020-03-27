@@ -14,6 +14,8 @@ namespace apkdiff {
 		{
 		}
 
+		public override string Name { get { return "Assemblies"; } }
+
 		TypeDefinition GetTypeDefinition (MetadataReader reader, TypeDefinitionHandle handle, out string fullName)
 		{
 			var typeDef = reader.GetTypeDefinition (handle);

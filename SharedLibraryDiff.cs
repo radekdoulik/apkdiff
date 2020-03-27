@@ -8,6 +8,8 @@ namespace apkdiff {
 		{
 		}
 
+		public override string Name { get { return "Shared libraries"; } }
+
 		string RunCommand (string cmd, string arguments)
 		{
 			String output;

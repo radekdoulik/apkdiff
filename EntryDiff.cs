@@ -2,6 +2,9 @@
 
 namespace apkdiff {
 	public abstract class EntryDiff {
+
+		public abstract string Name { get; }
+
 		public static EntryDiff ForExtension (string extension)
 		{
 			switch (extension) {
