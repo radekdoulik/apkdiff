@@ -215,7 +215,7 @@ namespace apkdiff {
 				Program.ColorWriteLine ($"  apk1: {PackageSize,12}  {PackagePath}\n  apk2: {other.PackageSize,12}  {other.PackagePath}", ConsoleColor.Gray);
 
 			foreach (var total in totalDifferences)
-				PrintDifference ($"{total.Key} ", total.Value.Difference, total.Value.OriginalTotal);
+				PrintDifference (total.Key, total.Value.Difference, total.Value.OriginalTotal);
 
 			PrintDifference ("Package size difference", other.PackageSize - PackageSize, PackageSize);
 		}
