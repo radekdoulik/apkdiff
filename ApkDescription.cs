@@ -206,6 +206,11 @@ namespace apkdiff {
 				if (!AddToDifference (diff.Key, diff.Value, out entryDiff))
 					continue;
 
+				if (Program.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > Program.AssemblyRegressionThreshold) {
+					Program.Error ($"Assembly size differs more than {Program.AssemblyRegressionThreshold} bytes.");
+					Program.RegressionFlag = true;
+				}
+
 				if (comparingApks && !single)
 					CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
 			}
