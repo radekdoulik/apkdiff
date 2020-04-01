@@ -5,6 +5,7 @@
     <TargetFramework>net472</TargetFramework>
     <Version>0.0.1</Version>
     <OutputType>Exe</OutputType>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
