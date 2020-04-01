@@ -12,6 +12,9 @@ namespace apkdiff {
 		public static bool SaveDescriptions;
 		public static bool Verbose;
 
+		public static long AssemblyRegressionThreshold;
+		public static long ApkRegressionThreshold;
+
 		public static void Main (string [] args)
 		{
 			var (path1, path2) = ProcessArguments (args);
@@ -22,6 +25,11 @@ namespace apkdiff {
 				var desc2 = ApkDescription.Load (path2);
 
 				desc1.Compare (desc2);
+
+				if (ApkRegressionThreshold != 0 && (desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
+					Error ($"PackageSize differ more than {ApkRegressionThreshold} bytes. apk1 size: {desc1.PackageSize} bytes, apk2 size: {desc2.PackageSize} bytes.");
+					Environment.Exit (3);
+				}
 			}
 		}
 
@@ -42,6 +50,9 @@ namespace apkdiff {
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },
+				{ "test-apk-size-regression=",
+					"Check whether apk size increased more than {BYTES}",
+				  v => ApkRegressionThreshold = long.Parse (v) },
 				{ "s|save-descriptions",
 					"Save .apkdesc files next to the apk package(s)",
 				  v => SaveDescriptions = true },
@@ -56,6 +67,11 @@ namespace apkdiff {
 				options.WriteOptionDescriptions (Out);
 
 				Environment.Exit (0);
+			}
+
+			if (remaining.Count != 2 && (ApkRegressionThreshold != 0 || AssemblyRegressionThreshold != 0)) {
+				Error ("Please specify 2 APK packages for regression testing.");
+				Environment.Exit (2);
 			}
 
 			if (remaining.Count != 2 && (remaining.Count != 1 || !SaveDescriptions)) {

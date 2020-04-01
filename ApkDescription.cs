@@ -19,7 +19,7 @@ namespace apkdiff {
 		string Comment;
 
 		[DataMember]
-		long PackageSize;
+		public long PackageSize { get; protected set; }
 		string PackagePath;
 
 		ZipArchive Archive;
