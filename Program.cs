@@ -14,7 +14,7 @@ namespace apkdiff {
 
 		public static long AssemblyRegressionThreshold;
 		public static long ApkRegressionThreshold;
-		public static bool RegressionFlag;
+		public static int RegressionCount;
 
 		public static void Main (string [] args)
 		{
@@ -29,12 +29,12 @@ namespace apkdiff {
 
 				if (ApkRegressionThreshold != 0 && (desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
 					Error ($"PackageSize differ more than {ApkRegressionThreshold} bytes. apk1 size: {desc1.PackageSize} bytes, apk2 size: {desc2.PackageSize} bytes.");
-					RegressionFlag = true;
+					RegressionCount ++;
 				}
 			}
 
-			if (RegressionFlag) {
-				Error ("Size regression occured, test failed.");
+			if (RegressionCount > 0) {
+				Error ($"Size regression occured, {RegressionCount} test(s) failed.");
 				Environment.Exit (3);
 			}
 		}

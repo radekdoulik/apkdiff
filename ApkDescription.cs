@@ -208,7 +208,7 @@ namespace apkdiff {
 
 				if (Program.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > Program.AssemblyRegressionThreshold) {
 					Program.Error ($"Assembly size differs more than {Program.AssemblyRegressionThreshold} bytes.");
-					Program.RegressionFlag = true;
+					Program.RegressionCount ++;
 				}
 
 				if (comparingApks && !single)
