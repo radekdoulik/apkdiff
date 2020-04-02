@@ -10,7 +10,11 @@ Copyright 2020 Microsoft Corporation
 Options:
   -c, --comment=VALUE        Comment to be saved inside .apkdesc file
   -h, --help, -?             Show this message and exit
-  -s, --save-descriptions    Save .apkdesc files next to the apk package(s)
+      --test-apk-size-regression=BYTES
+                             Check whether apk size increased more than BYTES
+      --test-assembly-size-regression=BYTES
+                             Check whether any assembly size increased more
+                               than BYTES  -s, --save-descriptions    Save .apkdesc files next to the apk package(s)
   -v, --verbose              Output information about progress during the run
                                of the tool
 ```
