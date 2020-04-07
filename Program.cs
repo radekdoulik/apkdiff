@@ -69,11 +69,17 @@ namespace apkdiff {
 				{ "v|verbose",
 					"Output information about progress during the run of the tool",
 				  v => Verbose = true },
-				{ "<>",
-				  v => { Error ($"Unknown option: {v}"); help = true; helpExitCode = 99; }  },
 			};
 
 			var remaining = options.Parse (args);
+
+			foreach (var s in remaining) {
+				if (s.Length > 0 && (s [0] == '-' || s [0] == '/') && !File.Exists (s)) {
+					Error ($"Unknown option: {s}");
+					help = true;
+					helpExitCode = 99;
+				}
+			}
 
 			if (help || args.Length < 1) {
 				options.WriteOptionDescriptions (Out);
