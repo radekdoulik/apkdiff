@@ -42,6 +42,7 @@ namespace apkdiff {
 		static (string, string) ProcessArguments (string [] args)
 		{
 			var help = false;
+			int helpExitCode = 0;
 			var options = new OptionSet {
 				$"Usage: {Name}.exe OPTIONS* <package1.[apk|aab][desc]> [<package2.[apk|aab][desc]>]",
 				"",
@@ -68,6 +69,8 @@ namespace apkdiff {
 				{ "v|verbose",
 					"Output information about progress during the run of the tool",
 				  v => Verbose = true },
+				{ "<>",
+				  v => { Error ($"Unknown option: {v}"); help = true; helpExitCode = 99; }  },
 			};
 
 			var remaining = options.Parse (args);
@@ -75,7 +78,7 @@ namespace apkdiff {
 			if (help || args.Length < 1) {
 				options.WriteOptionDescriptions (Out);
 
-				Environment.Exit (0);
+				Environment.Exit (helpExitCode);
 			}
 
 			if (remaining.Count != 2 && (ApkRegressionThreshold != 0 || AssemblyRegressionThreshold != 0)) {
