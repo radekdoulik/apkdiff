@@ -111,7 +111,7 @@ Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
 Summary:
   +       45056 Package size difference
 ```
-### Shared libraries section sizes comparison example:
+### Shared libraries section sizes comparison example
 ```
         Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
           +      376724 lib/x86/libsqlite3_xamarin.so
@@ -137,4 +137,23 @@ Summary:
             -          64 .dynsym
             -          84 .comment
             -       23984 .text
+```
+### Size regression test example
+```
+apkdiff.exe --test-apk-size-regression=51200
+--test-assembly-size-regression=51200 Xamarin.Forms_Performance_Integration-Signed-Release.apkdesc TestDebug\Xamarin.Forms_Performance_Integration-Signed.apk
+Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
+  +  26,749,952 assemblies/Mono.Android.dll
+Error: apkdiff: Assembly size differs more than 51,200 bytes.
+  +  14,655,424 assemblies/Mono.Android.pdb *2
+  +   2,423,388 lib/x86/libmonosgen-2.0.so
+  +   2,413,568 assemblies/mscorlib.dll
+Error: apkdiff: Assembly size differs more than 51,200 bytes.
+...
+Summary:
+  +  43,001,792 Assemblies 303.25% (of 14,180,480)
+  +  10,653,224 Shared libraries 89.86% (of 11,855,444)
+  +  66,973,060 Package size difference 318.80% (of 21,007,581)
+Error: apkdiff: PackageSize differ more than 51,200 bytes. apk1 size: 21,007,581 bytes, apk2 size: 87,980,641 bytes.
+Error: apkdiff: Size regression occured, 39 test(s) failed.
 ```
