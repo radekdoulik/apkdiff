@@ -163,3 +163,23 @@ Summary:
 Error: apkdiff: PackageSize differ more than 51,200 bytes. apk1 size: 21,007,581 bytes, apk2 size: 87,980,641 bytes.
 Error: apkdiff: Size regression occured, 39 test(s) failed.
 ```
+### Comparison including DEX file example
+```
+apkdiff Xamarin.Forms_Performance_Integration-Signed-orig.apk Xamarin.Forms_Performance_Integration-Signed.apk
+Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
+  +     255,792 classes.dex
+    +       2,023 strings count
+    +         260 types count
+    +         409 prototypes count
+    +       1,100 fields count
+    +       2,548 methods count
+    +         237 classes count
+    +     204,984 data section size
+  +         512 assemblies/System.dll
+  -          20 AndroidManifest.xml
+Summary:
+  +     255,792 Davik executables 13.15% (of 1,944,832)
+  +         512 Assemblies 0.00% (of 14,180,480)
+  +           0 Shared libraries 0.00% (of 11,856,152)
+  +     106,496 Package size difference 0.51% (of 21,007,581)
+```
