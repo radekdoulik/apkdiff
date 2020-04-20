@@ -10,13 +10,19 @@ Copyright 2020 Microsoft Corporation
 Options:
   -c, --comment=VALUE        Comment to be saved inside description file
   -h, --help, -?             Show this message and exit
-  -s, --save-descriptions    Save .[apk|aab]desc description files next to the
-                               package(s)
       --test-apk-size-regression=BYTES
                              Check whether apk size increased more than BYTES
       --test-assembly-size-regression=BYTES
                              Check whether any assembly size increased more
-                               than BYTES  -s, --save-descriptions    Save .apkdesc files next to the apk package(s)
+                               than BYTES
+  -s, --save-descriptions    Save .[apk|aab]desc description files next to the
+                               package(s) or to the specified path
+      --save-description-1=PATH
+                             Save .[apk|aab]desc description for first package
+                               to PATH
+      --save-description-2=PATH
+                             Save .[apk|aab]desc description for second package
+                               to PATH
   -v, --verbose              Output information about progress during the run
                                of the tool
 ```
