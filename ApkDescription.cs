@@ -29,7 +29,7 @@ namespace apkdiff {
 
 		Dictionary<string, (long Difference, long OriginalTotal)> totalDifferences = new Dictionary<string, (long, long)> ();
 
-		public static ApkDescription Load (string path)
+		public static ApkDescription Load (string path, string saveDescriptionPath = null)
 		{
 			if (!File.Exists (path)) {
 				Program.Error ($"File '{path}' does not exist.");
@@ -42,7 +42,7 @@ namespace apkdiff {
 			case ".aab":
 				var nd = new ApkDescription ();
 
-				nd.LoadApk (path);
+				nd.LoadApk (path, saveDescriptionPath);
 
 				return nd;
 			case ".apkdesc":
@@ -56,7 +56,7 @@ namespace apkdiff {
 			}
 		}
 
-		void LoadApk (string path)
+		void LoadApk (string path, string saveDescriptionPath = null)
 		{
 			Archive = ZipArchive.Open (path, FileMode.Open);
 
@@ -81,7 +81,7 @@ namespace apkdiff {
 			}
 
 			if (Program.SaveDescriptions) {
-				var descPath = Path.ChangeExtension (path, Path.GetExtension (path) + "desc");
+				var descPath = saveDescriptionPath ?? Path.ChangeExtension (path, Path.GetExtension (path) + "desc");
 
 				Program.ColorWriteLine ($"Saving apk description to '{descPath}'", ConsoleColor.Yellow);
 				SaveDescription (descPath);
