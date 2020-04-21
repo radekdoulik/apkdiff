@@ -1,5 +1,8 @@
 **apkdiff** is a tool to compare Android packages
 
+Upstream repository: https://github.com/radekdoulik/apkdiff
+Location of the tool included in Xamarin.Android: https://github.com/xamarin/xamarin-android/tree/master/tools/apkdiff
+
 ```
 Usage: apkdiff.exe OPTIONS* <package1.[apk|aab][desc]> [<package2.[apk|aab][desc]>]
 
