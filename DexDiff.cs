@@ -17,28 +17,28 @@ namespace apkdiff
 				using (var dex2 = new DexFile (other, padding)) {
 
 					if (dex1.linkSize != dex2.linkSize)
-						ApkDescription.PrintDifference ("link section size", dex2.linkSize - dex1.linkSize, "", padding);
+						ApkDescription.PrintDifference ("link section size", (long)dex2.linkSize - dex1.linkSize, "", padding);
 
 					if (dex1.stringIdsSize != dex2.stringIdsSize)
-						ApkDescription.PrintDifference ("strings count", dex2.stringIdsSize - dex1.stringIdsSize, "", padding);
+						ApkDescription.PrintDifference ("strings count", (long)dex2.stringIdsSize - dex1.stringIdsSize, "", padding);
 
 					if (dex1.typeIdsSize != dex2.typeIdsSize)
-						ApkDescription.PrintDifference ("types count", dex2.typeIdsSize - dex1.typeIdsSize, "", padding);
+						ApkDescription.PrintDifference ("types count", (long)dex2.typeIdsSize - dex1.typeIdsSize, "", padding);
 
 					if (dex1.protoIdsSize != dex2.protoIdsSize)
-						ApkDescription.PrintDifference ("prototypes count", dex2.protoIdsSize - dex1.protoIdsSize, "", padding);
+						ApkDescription.PrintDifference ("prototypes count", (long)dex2.protoIdsSize - dex1.protoIdsSize, "", padding);
 
 					if (dex1.fieldIdsSize != dex2.fieldIdsSize)
-						ApkDescription.PrintDifference ("fields count", dex2.fieldIdsSize - dex1.fieldIdsSize, "", padding);
+						ApkDescription.PrintDifference ("fields count", (long)dex2.fieldIdsSize - dex1.fieldIdsSize, "", padding);
 
 					if (dex1.methodIdsSize != dex2.methodIdsSize)
-						ApkDescription.PrintDifference ("methods count", dex2.methodIdsSize - dex1.methodIdsSize, "", padding);
+						ApkDescription.PrintDifference ("methods count", (long)dex2.methodIdsSize - dex1.methodIdsSize, "", padding);
 
 					if (dex1.classDefsSize != dex2.classDefsSize)
-						ApkDescription.PrintDifference ("classes count", dex2.classDefsSize - dex1.classDefsSize, "", padding);
+						ApkDescription.PrintDifference ("classes count", (long)dex2.classDefsSize - dex1.classDefsSize, "", padding);
 
 					if (dex1.dataSize != dex2.dataSize)
-						ApkDescription.PrintDifference ("data section size", dex2.dataSize - dex1.dataSize, "", padding);
+						ApkDescription.PrintDifference ("data section size", (long)dex2.dataSize - dex1.dataSize, "", padding);
 
 				}
 			}
