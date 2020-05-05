@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 
 namespace apkdiff {
 	public class SharedLibraryDiff : EntryDiff {
@@ -42,26 +43,45 @@ namespace apkdiff {
 			return output;
 		}
 
+		bool UnixPlatforms
+		{
+			get {
+				var platform = Environment.OSVersion.Platform;
+				return platform == PlatformID.Unix || platform == PlatformID.MacOSX;
+			}
+		}
+
+		string PlatformExtension
+		{
+			get
+			{
+				return UnixPlatforms ? "" : ".exe";
+			}
+		}
+
+
 		string HomeDir {
 			get {
-				return Environment.GetEnvironmentVariable ("HOME");
+				return UnixPlatforms
+					? Environment.GetEnvironmentVariable ("HOME")
+					: Environment.ExpandEnvironmentVariables ("%HOMEDRIVE%%HOMEPATH%");
 			}
 		}
 
 		string AndroidToolsDir {
 			get {
-				return HomeDir + "/android-toolchain/toolchains/x86-clang/bin";
+				return HomeDir + (UnixPlatforms ? "/android-toolchain/toolchains/x86-clang/bin" : "/android-toolchain/ndk/toolchains/llvm/prebuilt/windows-x86_64/bin");
 			}
 		}
 
 		string RunNMCmd (string file)
 		{
-			return RunCommand ($"{AndroidToolsDir}/x86_64-linux-android-nm", $"-S --size-sort -D {file}");
+			return RunCommand ($"{AndroidToolsDir}/x86_64-linux-android-nm{PlatformExtension}", $"-S --size-sort -D {file}");
 		}
 
 		string RunSizeCmd (string file)
 		{
-			return RunCommand ($"{AndroidToolsDir}/x86_64-linux-android-size", $"-A {file}");
+			return RunCommand ($"{AndroidToolsDir}/x86_64-linux-android-size{PlatformExtension}", $"-A {file}");
 		}
 
 		struct SymbolInfo : ISizeProvider {
@@ -193,6 +213,9 @@ namespace apkdiff {
 
 		public override void Compare (string file, string other, string padding)
 		{
+			if (!Directory.Exists (AndroidToolsDir))
+				return;
+
 			CompareSections (file, other, padding);
 			CompareSymbols (file, other, padding);
 		}
