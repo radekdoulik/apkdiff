@@ -17,16 +17,16 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+        source-url: https://nuget.pkg.github.com/<owner>/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    with:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
-    env:
-      NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-    with:
-      source-url: https://nuget.pkg.github.com/<owner>/index.json
     - name: Pack nuget
       run: dotnet pack -c Release
     - name: Publish to github
