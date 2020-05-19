@@ -29,7 +29,10 @@ jobs:
     - name: Pack nuget
       run: dotnet pack -c Release
     - name: Publish to github
-      run: dotnet nuget push nupkg/*.nupkg --skip-duplicate --no-symbols true
+      run:
+        nuget sources Add -Name "GPR" -Source ${{ secrets.GPR_URI }} -UserName ${{ GPR_USERNAME }} -Password ${{ secrets.GITHUB_TOKEN }}
+        nuget setApiKey ${{ secrets.NUGET_API_KEY }} -Source "GPR"
+        nuget push NuGet\*.nupkg -Source "GPR" -SkipDuplicate
 
 
 
