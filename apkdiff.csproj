@@ -4,8 +4,12 @@
     <Copyright>2020 Microsoft Corporation</Copyright>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Version>0.0.1</Version>
+    <Authors>Radek Doulik</Authors>
     <OutputType>Exe</OutputType>
     <PlatformTarget>x64</PlatformTarget>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>apkdiff</ToolCommandName>
+    <PackageOutputPath>nupkg</PackageOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
