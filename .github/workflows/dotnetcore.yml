@@ -28,6 +28,13 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Pack nuget
       run: dotnet pack -c Release
+    - name: Artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: NuGet
+        path: nugets
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1
     - name: Publish to github
       run: |
         nuget sources Add -Name "GPR" -Source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" -UserName ${{ github.repository_owner }} -Password ${{ secrets.GITHUB_TOKEN }}
