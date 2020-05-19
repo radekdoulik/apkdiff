@@ -32,7 +32,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: NuGet
-        path: nugets
+        path: nupkg
     - name: Setup NuGet
       uses: nuget/setup-nuget@v1
     - name: Publish to github
