@@ -23,3 +23,18 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+
+  publish:
+    name: Publish nuget package
+    env:
+      NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    with:
+      source-url: https://nuget.pkg.github.com/<owner>/index.json
+    needs: build
+    - name: Pack nuget
+      run: dotnet pack -c Release
+    - name: Publish to github
+      run: dotnet nuget push nupkg/*.nupkg --skip-duplicate --no-symbols true
+
+
+
