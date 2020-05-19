@@ -1,6 +1,7 @@
 **apkdiff** is a tool to compare Android packages
 
-Upstream repository: https://github.com/radekdoulik/apkdiff
+#### Build status
+![.NET Core](https://github.com/radekdoulik/apkdiff/workflows/.NET%20Core/badge.svg)
 
 Location of the tool included in Xamarin.Android: https://github.com/xamarin/xamarin-android/tree/master/tools/apkdiff
 
