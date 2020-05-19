@@ -10,6 +10,8 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>apkdiff</ToolCommandName>
     <PackageOutputPath>nupkg</PackageOutputPath>
+    <PackageDescription>A tool to compare Android packages</PackageDescription>
+    <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
