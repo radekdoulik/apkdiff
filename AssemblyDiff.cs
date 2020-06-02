@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using K4os.Compression.LZ4;
 
 namespace apkdiff {
 	public class AssemblyDiff : EntryDiff {
@@ -39,11 +41,59 @@ namespace apkdiff {
 			return typeDef;
 		}
 
+		const uint CompressedDataMagic = 0x5A4C4158; // 'XALZ', little-endian
+		static readonly ArrayPool<byte> bytePool = ArrayPool<byte>.Shared;
+
+		PEReader GetPEReaderCompressedAssembly (string filename, BinaryReader binReader, int length)
+		{
+			var fileInfo = new FileInfo (filename);
+			var compressedData = bytePool.Rent ((int)(fileInfo.Length - 12));
+			binReader.Read (compressedData, 0, compressedData.Length);
+
+			var decodedData = bytePool.Rent (length);
+			LZ4Codec.Decode (compressedData, decodedData);
+			bytePool.Return (compressedData);
+
+			return new PEReader (new MemoryStream (decodedData));
+		}
+
+		PEReader GetPEReader (string filename, string padding)
+		{
+			FileStream fileStream = null;
+			try {
+				fileStream = File.OpenRead (filename);
+
+				var binReader = new BinaryReader (fileStream);
+				var header = binReader.ReadUInt32 ();
+				var descriptorIndex = binReader.ReadUInt32 ();
+				var length = binReader.ReadUInt32 ();
+				if (header == CompressedDataMagic) {
+					if (Program.Verbose)
+						Program.ColorWriteLine ($"{padding}LZ4 compression detected for '{filename}'", ConsoleColor.Yellow);
+
+					var reader = GetPEReaderCompressedAssembly (filename, binReader, (int)length);
+					binReader.Dispose ();
+					fileStream.Dispose ();
+
+					return reader;
+				}
+
+				binReader.BaseStream.Seek (0, SeekOrigin.Begin);
+
+				return new PEReader (binReader.BaseStream);
+
+			} catch (Exception e) {
+				if (fileStream != null)
+					fileStream.Dispose ();
+
+				throw new InvalidOperationException ($"Unable to read the assembly: {filename}\n{e}");
+			}
+		}
+
 		public override void Compare (string file, string other, string padding)
 		{
-			using (var per1 = new PEReader (File.OpenRead (file))) {
-				using (var per2 = new PEReader (File.OpenRead (other))) {
-
+			using (var per1 = GetPEReader (file, padding)) {
+				using (var per2 = GetPEReader (other, padding)) {
 					reader1 = per1.GetMetadataReader ();
 					reader2 = per2.GetMetadataReader ();
 

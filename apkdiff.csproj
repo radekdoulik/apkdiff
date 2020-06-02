@@ -14,6 +14,7 @@
     <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.1.11" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
