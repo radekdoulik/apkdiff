@@ -12,14 +12,15 @@
     <PackageOutputPath>nupkg</PackageOutputPath>
     <PackageDescription>A tool to compare Android packages</PackageDescription>
     <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
+    <LibZipSharpVersion>1.0.20</LibZipSharpVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="K4os.Compression.LZ4" Version="1.1.11" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
-    <PackageReference Include="Xamarin.LibZipSharp" Version="1.0.9" />
+    <PackageReference Include="Xamarin.LibZipSharp" Version="$(LibZipSharpVersion)" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.8.0" />
   </ItemGroup>
-  <Import Project="packages\Xamarin.LibZipSharp.1.0.8\build\Xamarin.LibZipSharp.targets" Condition="Exists('packages\Xamarin.LibZipSharp.1.0.8\build\Xamarin.LibZipSharp.targets')" />
+  <Import Project="packages\Xamarin.LibZipSharp.$(LibZipSharpVersion)\build\Xamarin.LibZipSharp.targets" Condition="Exists('packages\Xamarin.LibZipSharp.$(LibZipSharpVersion)\build\Xamarin.LibZipSharp.targets')" />
 </Project>
