@@ -9,7 +9,7 @@ namespace apkdiff
 {
 	class DexDiff : EntryDiff
 	{
-		public override string Name { get { return "Davik executables"; } }
+		public override string Name { get { return "Dalvik executables"; } }
 
 		public override void Compare (string file, string other, string padding)
 		{

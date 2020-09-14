@@ -183,7 +183,7 @@ Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
   +         512 assemblies/System.dll
   -          20 AndroidManifest.xml
 Summary:
-  +     255,792 Davik executables 13.15% (of 1,944,832)
+  +     255,792 Dalvik executables 13.15% (of 1,944,832)
   +         512 Assemblies 0.00% (of 14,180,480)
   +           0 Shared libraries 0.00% (of 11,856,152)
   +     106,496 Package size difference 0.51% (of 21,007,581)
