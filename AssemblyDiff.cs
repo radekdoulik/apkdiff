@@ -187,22 +187,53 @@ namespace apkdiff {
 			var dict1 = GetCustomAttributes (reader1, cac1);
 			var dict2 = GetCustomAttributes (reader2, cac2);
 
-			foreach (var pair in dict1) {
-				if (!dict2.ContainsKey (pair.Key)) {
-					Console.WriteLine ($"{padding}  -             CustomAttribute {pair.Key}");
-				}
+			CompareKeys (dict1.Keys, dict2.Keys, "CustomAttribute", padding);
+		}
+
+		Dictionary<string, MethodDefinition> GetMethods (MetadataReader reader, MethodDefinitionHandleCollection mhc)
+		{
+			var dict = new Dictionary<string, MethodDefinition> ();
+
+			foreach (var h in mhc) {
+				var md = reader.GetMethodDefinition (h);
+				var fullName = $"{GetTypeName (reader, md.GetDeclaringType ())}.{reader.GetString (md.Name)}";
+				dict [fullName] = md;
 			}
 
-			foreach (var pair in dict2) {
-				if (!dict1.ContainsKey (pair.Key)) {
-					Console.WriteLine ($"{padding}  +             CustomAttribute {pair.Key}");
-				}
-			}
+			return dict;
+		}
+
+		void CompareMethods (MethodDefinitionHandleCollection mc1, MethodDefinitionHandleCollection mc2, string padding)
+		{
+			var dict1 = GetMethods (reader1, mc1);
+			var dict2 = GetMethods (reader2, mc2);
+
+			CompareKeys (dict1.Keys, dict2.Keys, "Method", padding);
 		}
 
 		void CompareTypes (TypeDefinition type1, TypeDefinition type2, string padding)
 		{
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
+			CompareMethods (type1.GetMethods (), type2.GetMethods (), padding);
+		}
+
+		void CompareKeys (ICollection<string> col1, ICollection<string> col2, string name, string padding)
+		{
+			foreach (var key in col1) {
+				if (!col2.Contains (key)) {
+					Console.Write ($"{padding}  ");
+					Program.ColorWrite ("-", ConsoleColor.Green);
+					Console.WriteLine ($"             {name} {key}");
+				}
+			}
+
+			foreach (var key in col2) {
+				if (!col1.Contains (key)) {
+					Console.Write ($"{padding}  ");
+					Program.ColorWrite ("+", ConsoleColor.Red);
+					Console.WriteLine ($"             {name} {key}");
+				}
+			}
 		}
 	}
 }
