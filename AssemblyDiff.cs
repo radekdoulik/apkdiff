@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Text;
 using K4os.Compression.LZ4;
 
 namespace apkdiff {
@@ -17,6 +18,8 @@ namespace apkdiff {
 		}
 
 		public override string Name { get { return "Assemblies"; } }
+
+		Stack<Delegate> headers = new Stack<Delegate> ();
 
 		TypeDefinition GetTypeDefinition (MetadataReader reader, TypeDefinitionHandle handle, out string fullName)
 		{
@@ -112,7 +115,7 @@ namespace apkdiff {
 						types2 [fullName] = td;
 					}
 
-					CompareTypeDictionaries (types1, types2, padding);
+					CompareTypeDictionaries (types1, types2, padding, false);
 				}
 			}
 		}
@@ -185,8 +188,7 @@ namespace apkdiff {
 
 			foreach (var h in mhc) {
 				var md = reader.GetMethodDefinition (h);
-				var fullName = $"{GetTypeName (reader, md.GetDeclaringType ())}.{reader.GetString (md.Name)}";
-				dict [fullName] = md;
+				dict [reader.GetString (md.Name)] = md;
 			}
 
 			return dict;
@@ -200,28 +202,66 @@ namespace apkdiff {
 			CompareKeys (dict1.Keys, dict2.Keys, "Method", padding);
 		}
 
+		string GetTypeFullname (MetadataReader reader, TypeDefinition td)
+		{
+			StringBuilder sb = new StringBuilder ();
+			//if (td.IsNested) {
+			//	sb.Append (GetTypeFullname (reader, reader.GetTypeDefinition (td.GetDeclaringType ())));
+			//}
+			var ns = reader.GetString (td.Namespace);
+			if (ns.Length > 0) {
+				sb.Append (ns);
+				sb.Append (".");
+			}
+			sb.Append (reader.GetString (td.Name));
+
+			return sb.ToString ();
+		}
+
+		int PushHeader (Delegate d)
+		{
+			headers.Push (d);
+
+			return headers.Count;
+		}
+
+		void PopHeader (int count)
+		{
+			if (headers.Count == count)
+				headers.Pop ();
+		}
+
 		void CompareTypes (TypeDefinition type1, TypeDefinition type2, string padding)
 		{
+			var count = PushHeader (new Action (() => Console.WriteLine ($"{padding} Type {GetTypeFullname (reader1, type1)}")));
+
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
 			CompareMethods (type1.GetMethods (), type2.GetMethods (), padding);
 
 			var nTypes1 = GetNestedTypes (reader1, type1);
 			var nTypes2 = GetNestedTypes (reader2, type2);
 
-			CompareTypeDictionaries (nTypes1, nTypes2, padding);
+			CompareTypeDictionaries (nTypes1, nTypes2, padding, true);
+
+			PopHeader (count);
 		}
 
-		void CompareTypeDictionaries (Dictionary<string, TypeDefinition> types1, Dictionary<string, TypeDefinition> types2, string padding)
+		void CompareTypeDictionaries (Dictionary<string, TypeDefinition> types1, Dictionary<string, TypeDefinition> types2, string padding, bool compareNested)
 		{
 			foreach (var pair in types1) {
 				if (!types2.ContainsKey (pair.Key)) {
+					PrintHeader ();
 					Console.WriteLine ($"{padding}  -             Type {pair.Key}");
-				} else
-					CompareTypes (types1 [pair.Key], types2 [pair.Key], padding + "  ");
+				} else {
+					var type = types1 [pair.Key];
+					if (compareNested || !type.IsNested)
+						CompareTypes (type, types2 [pair.Key], padding + "  ");
+				}
 			}
 
 			foreach (var pair in types2) {
 				if (!types1.ContainsKey (pair.Key)) {
+					PrintHeader ();
 					Console.WriteLine ($"{padding}  +             Type {pair.Key}");
 				}
 			}
@@ -243,6 +283,7 @@ namespace apkdiff {
 		{
 			foreach (var key in col1) {
 				if (!col2.Contains (key)) {
+					PrintHeader ();
 					Console.Write ($"{padding}  ");
 					Program.ColorWrite ("-", ConsoleColor.Green);
 					Console.WriteLine ($"             {name} {key}");
@@ -251,10 +292,19 @@ namespace apkdiff {
 
 			foreach (var key in col2) {
 				if (!col1.Contains (key)) {
+					PrintHeader ();
 					Console.Write ($"{padding}  ");
 					Program.ColorWrite ("+", ConsoleColor.Red);
 					Console.WriteLine ($"             {name} {key}");
 				}
+			}
+		}
+
+		void PrintHeader ()
+		{
+			while (headers.Count > 0) {
+				var d = headers.Pop ();
+				d.DynamicInvoke ();
 			}
 		}
 	}
