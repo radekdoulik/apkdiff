@@ -112,18 +112,7 @@ namespace apkdiff {
 						types2 [fullName] = td;
 					}
 
-					foreach (var pair in types1) {
-						if (!types2.ContainsKey (pair.Key)) {
-							Console.WriteLine ($"{padding}  -             Type {pair.Key}");
-						} else
-							CompareTypes (types1 [pair.Key], types2 [pair.Key], padding + "  ");
-					}
-
-					foreach (var pair in types2) {
-						if (!types1.ContainsKey (pair.Key)) {
-							Console.WriteLine ($"{padding}  +             Type {pair.Key}");
-						}
-					}
+					CompareTypeDictionaries (types1, types2, padding);
 				}
 			}
 		}
@@ -215,6 +204,39 @@ namespace apkdiff {
 		{
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
 			CompareMethods (type1.GetMethods (), type2.GetMethods (), padding);
+
+			var nTypes1 = GetNestedTypes (reader1, type1);
+			var nTypes2 = GetNestedTypes (reader2, type2);
+
+			CompareTypeDictionaries (nTypes1, nTypes2, padding);
+		}
+
+		void CompareTypeDictionaries (Dictionary<string, TypeDefinition> types1, Dictionary<string, TypeDefinition> types2, string padding)
+		{
+			foreach (var pair in types1) {
+				if (!types2.ContainsKey (pair.Key)) {
+					Console.WriteLine ($"{padding}  -             Type {pair.Key}");
+				} else
+					CompareTypes (types1 [pair.Key], types2 [pair.Key], padding + "  ");
+			}
+
+			foreach (var pair in types2) {
+				if (!types1.ContainsKey (pair.Key)) {
+					Console.WriteLine ($"{padding}  +             Type {pair.Key}");
+				}
+			}
+		}
+
+		Dictionary<string, TypeDefinition> GetNestedTypes (MetadataReader reader, TypeDefinition td)
+		{
+			var dict = new Dictionary<string, TypeDefinition> ();
+
+			foreach (var nthd in td.GetNestedTypes ()) {
+				var ntd = reader.GetTypeDefinition (nthd);
+				dict [reader.GetString (td.Name)] = ntd;
+			}
+
+			return dict;
 		}
 
 		void CompareKeys (ICollection<string> col1, ICollection<string> col2, string name, string padding)
