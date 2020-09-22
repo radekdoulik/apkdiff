@@ -19,7 +19,7 @@ namespace apkdiff {
 
 		public override string Name { get { return "Assemblies"; } }
 
-		Stack<Delegate> headers = new Stack<Delegate> ();
+		List<Delegate> headers = new List<Delegate> ();
 
 		TypeDefinition GetTypeDefinition (MetadataReader reader, TypeDefinitionHandle handle, out string fullName)
 		{
@@ -220,7 +220,7 @@ namespace apkdiff {
 
 		int PushHeader (Delegate d)
 		{
-			headers.Push (d);
+			headers.Add (d);
 
 			return headers.Count;
 		}
@@ -228,7 +228,7 @@ namespace apkdiff {
 		void PopHeader (int count)
 		{
 			if (headers.Count == count)
-				headers.Pop ();
+				headers.RemoveAt (headers.Count - 1);
 		}
 
 		void CompareTypes (TypeDefinition type1, TypeDefinition type2, string padding)
@@ -302,10 +302,10 @@ namespace apkdiff {
 
 		void PrintHeader ()
 		{
-			while (headers.Count > 0) {
-				var d = headers.Pop ();
+			foreach (var d in headers)
 				d.DynamicInvoke ();
-			}
+
+			headers.Clear ();
 		}
 	}
 }
