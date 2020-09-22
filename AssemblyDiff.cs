@@ -233,7 +233,7 @@ namespace apkdiff {
 
 		void CompareTypes (TypeDefinition type1, TypeDefinition type2, string padding)
 		{
-			var count = PushHeader (new Action (() => Console.WriteLine ($"{padding} Type {GetTypeFullname (reader1, type1)}")));
+			var count = PushHeader (new Action (() => Console.WriteLine ($"{padding}Type {GetTypeFullname (reader1, type1)}")));
 
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
 			CompareMethods (type1.GetMethods (), type2.GetMethods (), padding);
