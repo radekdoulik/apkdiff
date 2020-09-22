@@ -273,7 +273,7 @@ namespace apkdiff {
 
 			foreach (var nthd in td.GetNestedTypes ()) {
 				var ntd = reader.GetTypeDefinition (nthd);
-				dict [reader.GetString (td.Name)] = ntd;
+				dict [reader.GetString (ntd.Name)] = ntd;
 			}
 
 			return dict;
