@@ -182,13 +182,44 @@ namespace apkdiff {
 			CompareKeys (dict1.Keys, dict2.Keys, "CustomAttribute", padding);
 		}
 
+		string GetMethodString (MetadataReader reader, MethodDefinition md)
+		{
+			StringBuilder sb = new StringBuilder ();
+
+			if ((md.Attributes & System.Reflection.MethodAttributes.Static) == System.Reflection.MethodAttributes.Static)
+				sb.Append ("static ");
+			if ((md.Attributes & System.Reflection.MethodAttributes.Public) == System.Reflection.MethodAttributes.Public)
+				sb.Append ("public ");
+
+			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), new GenericContext ());
+
+			sb.Append (signature.ReturnType);
+			sb.Append (' ');
+			sb.Append (reader.GetString (md.Name));
+
+			sb.Append (" (");
+			var first = true;
+			foreach (var p in signature.ParameterTypes) {
+				if (first)
+					first = false;
+				else
+					sb.Append (", ");
+
+				sb.Append (p);
+			}
+
+			sb.Append (')');
+
+			return sb.ToString ();
+		}
+
 		Dictionary<string, MethodDefinition> GetMethods (MetadataReader reader, MethodDefinitionHandleCollection mhc)
 		{
 			var dict = new Dictionary<string, MethodDefinition> ();
 
 			foreach (var h in mhc) {
 				var md = reader.GetMethodDefinition (h);
-				dict [reader.GetString (md.Name)] = md;
+				dict [GetMethodString (reader, md)] = md;
 			}
 
 			return dict;
