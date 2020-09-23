@@ -33,7 +33,8 @@ namespace apkdiff
 
 		public string GetGenericTypeParameter (GenericContext genericContext, int index)
 		{
-			throw new NotImplementedException ();
+			var reader = genericContext.Reader;
+			return $"!{reader.GetString (reader.GetGenericParameter (genericContext.TypeParameters [index]).Name)}";
 		}
 
 		public string GetModifiedType (string modifier, string unmodifiedType, bool isRequired)

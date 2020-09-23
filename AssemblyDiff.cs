@@ -182,7 +182,7 @@ namespace apkdiff {
 			CompareKeys (dict1.Keys, dict2.Keys, "CustomAttribute", padding);
 		}
 
-		string GetMethodString (MetadataReader reader, MethodDefinition md)
+		string GetMethodString (MetadataReader reader, TypeDefinition td, MethodDefinition md)
 		{
 			StringBuilder sb = new StringBuilder ();
 
@@ -191,7 +191,8 @@ namespace apkdiff {
 			if ((md.Attributes & System.Reflection.MethodAttributes.Public) == System.Reflection.MethodAttributes.Public)
 				sb.Append ("public ");
 
-			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), new GenericContext (md.GetGenericParameters (), reader));
+			var context = new GenericContext (md.GetGenericParameters (), td.GetGenericParameters (), reader);
+			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context);
 
 			sb.Append (signature.ReturnType);
 			sb.Append (' ');
@@ -213,22 +214,22 @@ namespace apkdiff {
 			return sb.ToString ();
 		}
 
-		Dictionary<string, MethodDefinition> GetMethods (MetadataReader reader, MethodDefinitionHandleCollection mhc)
+		Dictionary<string, MethodDefinition> GetMethods (MetadataReader reader, TypeDefinition type)
 		{
 			var dict = new Dictionary<string, MethodDefinition> ();
 
-			foreach (var h in mhc) {
+			foreach (var h in type.GetMethods ()) {
 				var md = reader.GetMethodDefinition (h);
-				dict [GetMethodString (reader, md)] = md;
+				dict [GetMethodString (reader, type, md)] = md;
 			}
 
 			return dict;
 		}
 
-		void CompareMethods (MethodDefinitionHandleCollection mc1, MethodDefinitionHandleCollection mc2, string padding)
+		void CompareMethods (TypeDefinition type1, TypeDefinition type2, string padding)
 		{
-			var dict1 = GetMethods (reader1, mc1);
-			var dict2 = GetMethods (reader2, mc2);
+			var dict1 = GetMethods (reader1, type1);
+			var dict2 = GetMethods (reader2, type2);
 
 			CompareKeys (dict1.Keys, dict2.Keys, "Method", padding);
 		}
@@ -267,7 +268,7 @@ namespace apkdiff {
 			var count = PushHeader (new Action (() => Console.WriteLine ($"{padding}Type {GetTypeFullname (reader1, type1)}")));
 
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
-			CompareMethods (type1.GetMethods (), type2.GetMethods (), padding);
+			CompareMethods (type1, type2, padding);
 
 			var nTypes1 = GetNestedTypes (reader1, type1);
 			var nTypes2 = GetNestedTypes (reader2, type2);
