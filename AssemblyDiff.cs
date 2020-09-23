@@ -265,7 +265,11 @@ namespace apkdiff {
 
 		void CompareTypes (TypeDefinition type1, TypeDefinition type2, string padding)
 		{
-			var count = PushHeader (new Action (() => Console.WriteLine ($"{padding}Type {GetTypeFullname (reader1, type1)}")));
+			var count = PushHeader (new Action (() => {
+				Console.Write (padding);
+				Program.ColorWrite ("Type", ConsoleColor.Green);
+				Console.WriteLine ($" {GetTypeFullname (reader1, type1)}");
+			}));
 
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
 			CompareMethods (type1, type2, padding);
@@ -318,7 +322,9 @@ namespace apkdiff {
 					PrintHeader ();
 					Console.Write ($"{padding}  ");
 					Program.ColorWrite ("-", ConsoleColor.Green);
-					Console.WriteLine ($"             {name} {key}");
+					Console.Write ($"             ");
+					Program.ColorWrite (name, ConsoleColor.Green);
+					Console.WriteLine ($" {key}");
 				}
 			}
 
@@ -327,7 +333,9 @@ namespace apkdiff {
 					PrintHeader ();
 					Console.Write ($"{padding}  ");
 					Program.ColorWrite ("+", ConsoleColor.Red);
-					Console.WriteLine ($"             {name} {key}");
+					Console.Write ($"             ");
+					Program.ColorWrite (name, ConsoleColor.Green);
+					Console.WriteLine ($" {key}");
 				}
 			}
 		}
