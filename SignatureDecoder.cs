@@ -23,7 +23,7 @@ namespace apkdiff
 
 		public string GetGenericInstantiation (string genericType, ImmutableArray<string> typeArguments)
 		{
-			throw new NotImplementedException ();
+			return $"{genericType}<{string.Join (',', typeArguments)}>";
 		}
 
 		public string GetGenericMethodParameter (GenericContext genericContext, int index)
@@ -107,7 +107,11 @@ namespace apkdiff
 
 		public string GetTypeFromReference (MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
 		{
-			throw new NotImplementedException ();
+			var tr = reader.GetTypeReference (handle);
+			var name = reader.GetString (tr.Name);
+
+			// todo: scope
+			return tr.Namespace.IsNil ? name : $"{reader.GetString (tr.Namespace)}.{name}";
 		}
 
 		public string GetTypeFromSpecification (MetadataReader reader, GenericContext genericContext, TypeSpecificationHandle handle, byte rawTypeKind)

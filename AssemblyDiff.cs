@@ -191,7 +191,7 @@ namespace apkdiff {
 			if ((md.Attributes & System.Reflection.MethodAttributes.Public) == System.Reflection.MethodAttributes.Public)
 				sb.Append ("public ");
 
-			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), new GenericContext ());
+			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), new GenericContext (md.GetGenericParameters (), reader));
 
 			sb.Append (signature.ReturnType);
 			sb.Append (' ');
