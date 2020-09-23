@@ -13,7 +13,7 @@ namespace apkdiff
 
 		public string GetByReferenceType (string elementType)
 		{
-			throw new NotImplementedException ();
+			return $"{elementType}&";
 		}
 
 		public string GetFunctionPointerType (MethodSignature<string> signature)
@@ -28,7 +28,9 @@ namespace apkdiff
 
 		public string GetGenericMethodParameter (GenericContext genericContext, int index)
 		{
-			throw new NotImplementedException ();
+			var reader = genericContext.Reader;
+
+			return $"!!{reader.GetString (reader.GetGenericParameter (genericContext.Parameters [index]).Name)}";
 		}
 
 		public string GetGenericTypeParameter (GenericContext genericContext, int index)
@@ -39,7 +41,9 @@ namespace apkdiff
 
 		public string GetModifiedType (string modifier, string unmodifiedType, bool isRequired)
 		{
-			throw new NotImplementedException ();
+			var modStr = isRequired ? "modReq" : "modOpt";
+
+			return $"{unmodifiedType}{modStr}({modifier})";
 		}
 
 		public string GetPinnedType (string elementType)
@@ -49,7 +53,7 @@ namespace apkdiff
 
 		public string GetPointerType (string elementType)
 		{
-			throw new NotImplementedException ();
+			return $"{elementType}*";
 		}
 
 		public string GetPrimitiveType (PrimitiveTypeCode typeCode)
@@ -103,7 +107,11 @@ namespace apkdiff
 
 		public string GetTypeFromDefinition (MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)
 		{
-			throw new NotImplementedException ();
+			var td = reader.GetTypeDefinition (handle);
+			var name = reader.GetString (td.Name);
+			var fullName = td.Namespace.IsNil? name : $"{reader.GetString (td.Namespace)}.{name}";
+
+			return td.IsNested ? $"{GetTypeFromDefinition (reader, td.GetDeclaringType (), 0)}/{fullName}" : fullName;
 		}
 
 		public string GetTypeFromReference (MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
