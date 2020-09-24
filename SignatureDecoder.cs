@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Reflection.Metadata;
+using System.Text;
 
 namespace apkdiff
 {
@@ -8,7 +9,30 @@ namespace apkdiff
 	{
 		public string GetArrayType (string elementType, ArrayShape shape)
 		{
-			throw new NotImplementedException ();
+			var ranks = "";
+			StringBuilder sb = shape.Rank > 0 ? new StringBuilder() : null;
+
+			for (int i=0; i<shape.Rank; i++) {
+				if (i > 0)
+					sb.Append (", ");
+
+				int lower = 0;
+				if (shape.LowerBounds.Length < i) {
+					lower = shape.LowerBounds [i];
+					sb.Append (lower);
+				}
+
+				sb.Append ("...");
+
+				if (i < shape.Sizes.Length) {
+					sb.Append (shape.Sizes [i] + lower - 1);
+				}
+			}
+
+			if (sb != null)
+				ranks = sb.ToString ();
+
+			return $"{elementType}[{ranks}]";
 		}
 
 		public string GetByReferenceType (string elementType)
@@ -18,7 +42,23 @@ namespace apkdiff
 
 		public string GetFunctionPointerType (MethodSignature<string> signature)
 		{
-			throw new NotImplementedException ();
+			var parameters = "";
+			var count = signature.RequiredParameterCount;
+			var pTypes = signature.ParameterTypes;
+			var pCount = pTypes.Length;
+			StringBuilder sb = (count > 0 || pCount > 0) ? new StringBuilder () : null;
+
+			for (int i = 0; i < pCount; i++) {
+				if (i > 0)
+					sb.Append (i == count ? "..., " : ", ");
+
+				sb.Append (pTypes [i]);
+			}
+
+			if (sb != null)
+				parameters = sb.ToString ();
+
+			return $"method {signature.ReturnType} *({parameters})";
 		}
 
 		public string GetGenericInstantiation (string genericType, ImmutableArray<string> typeArguments)
@@ -48,7 +88,7 @@ namespace apkdiff
 
 		public string GetPinnedType (string elementType)
 		{
-			throw new NotImplementedException ();
+			return $"{elementType} pinned";
 		}
 
 		public string GetPointerType (string elementType)
@@ -125,7 +165,7 @@ namespace apkdiff
 
 		public string GetTypeFromSpecification (MetadataReader reader, GenericContext genericContext, TypeSpecificationHandle handle, byte rawTypeKind)
 		{
-			throw new NotImplementedException ();
+			return reader.GetTypeSpecification (handle).DecodeSignature (this, genericContext);
 		}
 	}
 }
