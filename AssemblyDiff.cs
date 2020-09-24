@@ -182,14 +182,30 @@ namespace apkdiff {
 			CompareKeys (dict1.Keys, dict2.Keys, "CustomAttribute", padding);
 		}
 
+		string GetFieldString (MetadataReader reader, TypeDefinition td, FieldDefinition fd)
+		{
+			StringBuilder sb = new StringBuilder ();
+
+			if ((fd.Attributes & System.Reflection.FieldAttributes.Public) == System.Reflection.FieldAttributes.Public)
+				sb.Append ("public ");
+			if ((fd.Attributes & System.Reflection.FieldAttributes.Static) == System.Reflection.FieldAttributes.Static)
+				sb.Append ("static ");
+			if ((fd.Attributes & System.Reflection.FieldAttributes.InitOnly) == System.Reflection.FieldAttributes.InitOnly)
+				sb.Append ("readonly ");
+
+			var context = new GenericContext (new GenericParameterHandleCollection (), td.GetGenericParameters (), reader);
+
+			return $"{sb.ToString ()}{fd.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context)} {reader.GetString (fd.Name)}";
+		}
+
 		string GetMethodString (MetadataReader reader, TypeDefinition td, MethodDefinition md)
 		{
 			StringBuilder sb = new StringBuilder ();
 
-			if ((md.Attributes & System.Reflection.MethodAttributes.Static) == System.Reflection.MethodAttributes.Static)
-				sb.Append ("static ");
 			if ((md.Attributes & System.Reflection.MethodAttributes.Public) == System.Reflection.MethodAttributes.Public)
 				sb.Append ("public ");
+			if ((md.Attributes & System.Reflection.MethodAttributes.Static) == System.Reflection.MethodAttributes.Static)
+				sb.Append ("static ");
 
 			var context = new GenericContext (md.GetGenericParameters (), td.GetGenericParameters (), reader);
 			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context);
@@ -214,6 +230,17 @@ namespace apkdiff {
 			return sb.ToString ();
 		}
 
+		Dictionary<string, FieldDefinition> GetFields (MetadataReader reader, TypeDefinition type)
+		{
+			var dict = new Dictionary<string, FieldDefinition> ();
+			foreach (var h in type.GetFields ()) {
+				var fd = reader.GetFieldDefinition (h);
+				dict [GetFieldString (reader, type, fd)] = fd;
+			}
+
+			return dict;
+		}
+
 		Dictionary<string, MethodDefinition> GetMethods (MetadataReader reader, TypeDefinition type)
 		{
 			var dict = new Dictionary<string, MethodDefinition> ();
@@ -224,6 +251,14 @@ namespace apkdiff {
 			}
 
 			return dict;
+		}
+
+		void CompareFields (TypeDefinition type1, TypeDefinition type2, string padding)
+		{
+			var dict1 = GetFields (reader1, type1);
+			var dict2 = GetFields (reader2, type2);
+
+			CompareKeys (dict1.Keys, dict2.Keys, "Field", padding);
 		}
 
 		void CompareMethods (TypeDefinition type1, TypeDefinition type2, string padding)
@@ -272,6 +307,7 @@ namespace apkdiff {
 			}));
 
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
+			CompareFields (type1, type2, padding);
 			CompareMethods (type1, type2, padding);
 
 			var nTypes1 = GetNestedTypes (reader1, type1);
