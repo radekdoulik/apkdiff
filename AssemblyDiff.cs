@@ -282,6 +282,21 @@ namespace apkdiff {
 			}
 			sb.Append (reader.GetString (td.Name));
 
+			var gps = td.GetGenericParameters ();
+			if (gps.Count > 0) {
+				sb.Append ('<');
+
+				for (int i = 0; i < 1; i++) {
+					if (i > 0)
+						sb.Append (", ");
+
+					var gp = reader.GetGenericParameter (gps [i]);
+					sb.Append (reader.GetString (gp.Name));
+				}
+
+				sb.Append ('>');
+			}
+
 			return sb.ToString ();
 		}
 
