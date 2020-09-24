@@ -197,9 +197,6 @@ namespace apkdiff {
 			}
 
 			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
-				if (diff.Value == 0)
-					continue;
-
 				var single = singles.Contains (diff.Key);
 
 				PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null);
