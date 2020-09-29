@@ -196,6 +196,30 @@ namespace apkdiff {
 			return $"{sb.ToString ()}{fd.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context)} {reader.GetString (fd.Name)}";
 		}
 
+		string GetPropertyString (MetadataReader reader, TypeDefinition td, PropertyDefinition pd)
+		{
+			StringBuilder sb = new StringBuilder ();
+
+			var context = new GenericContext (new GenericParameterHandleCollection (), td.GetGenericParameters (), reader);
+			var ms = pd.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context);
+			var pa = pd.GetAccessors ();
+			var ga = pa.Getter;
+			var sa = pa.Setter;
+			sb.Append ($"{ms.ReturnType} {reader.GetString (pd.Name)} {{ ");
+
+			if (!ga.IsNil) {
+				sb.Append ("get; ");
+			}
+
+			if (!sa.IsNil) {
+				sb.Append ("set; ");
+			}
+
+			sb.Append ('}');
+
+			return sb.ToString ();
+		}
+
 		string GetMethodString (MetadataReader reader, TypeDefinition td, MethodDefinition md)
 		{
 			StringBuilder sb = new StringBuilder ();
@@ -239,6 +263,17 @@ namespace apkdiff {
 			return dict;
 		}
 
+		Dictionary<string, PropertyDefinition> GetProperties (MetadataReader reader, TypeDefinition type)
+		{
+			var dict = new Dictionary<string, PropertyDefinition> ();
+			foreach (var h in type.GetProperties ()) {
+				var pd = reader.GetPropertyDefinition (h);
+				dict [GetPropertyString (reader, type, pd)] = pd;
+			}
+
+			return dict;
+		}
+
 		Dictionary<string, MethodDefinition> GetMethods (MetadataReader reader, TypeDefinition type)
 		{
 			var dict = new Dictionary<string, MethodDefinition> ();
@@ -257,6 +292,14 @@ namespace apkdiff {
 			var dict2 = GetFields (reader2, type2);
 
 			CompareKeys (dict1.Keys, dict2.Keys, "Field", padding);
+		}
+
+		void CompareProperties (TypeDefinition type1, TypeDefinition type2, string padding)
+		{
+			var dict1 = GetProperties (reader1, type1);
+			var dict2 = GetProperties (reader2, type2);
+
+			CompareKeys (dict1.Keys, dict2.Keys, "Property", padding);
 		}
 
 		void CompareMethods (TypeDefinition type1, TypeDefinition type2, string padding)
@@ -308,6 +351,7 @@ namespace apkdiff {
 
 			CompareCustomAttributes (type1.GetCustomAttributes (), type2.GetCustomAttributes (), padding);
 			CompareFields (type1, type2, padding);
+			CompareProperties (type1, type2, padding);
 			CompareMethods (type1, type2, padding);
 
 			var nTypes1 = GetNestedTypes (reader1, type1);
