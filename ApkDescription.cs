@@ -199,7 +199,12 @@ namespace apkdiff {
 			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
 				var single = singles.Contains (diff.Key);
 
-				PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null);
+				Action pa = new Action (() => PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null));
+				int count = -1;
+				if (diff.Value == 0)
+					count = Program.Print.Push (pa);
+				else
+					pa.DynamicInvoke ();
 
 				EntryDiff entryDiff;
 				if (!AddToDifference (diff.Key, diff.Value, out entryDiff))
@@ -212,6 +217,8 @@ namespace apkdiff {
 
 				if (comparingApks && !single)
 					CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
+
+				Program.Print.Pop (count);
 			}
 
 			Program.ColorWriteLine ("Summary:", ConsoleColor.Green);

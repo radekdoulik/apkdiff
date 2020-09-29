@@ -17,8 +17,12 @@ namespace apkdiff {
 		public static long ApkRegressionThreshold;
 		public static int RegressionCount;
 
+		public static PrintStack Print { get; private set; }
+
 		public static void Main (string [] args)
 		{
+			Print = new PrintStack ();
+
 			var (path1, path2) = ProcessArguments (args);
 
 			var desc1 = ApkDescription.Load (path1, SaveDescription1);

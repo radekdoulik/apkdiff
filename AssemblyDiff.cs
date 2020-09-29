@@ -19,8 +19,6 @@ namespace apkdiff {
 
 		public override string Name { get { return "Assemblies"; } }
 
-		List<Delegate> headers = new List<Delegate> ();
-
 		TypeDefinition GetTypeDefinition (MetadataReader reader, TypeDefinitionHandle handle, out string fullName)
 		{
 			var typeDef = reader.GetTypeDefinition (handle);
@@ -300,22 +298,9 @@ namespace apkdiff {
 			return sb.ToString ();
 		}
 
-		int PushHeader (Delegate d)
-		{
-			headers.Add (d);
-
-			return headers.Count;
-		}
-
-		void PopHeader (int count)
-		{
-			if (headers.Count == count)
-				headers.RemoveAt (headers.Count - 1);
-		}
-
 		void CompareTypes (TypeDefinition type1, TypeDefinition type2, string padding)
 		{
-			var count = PushHeader (new Action (() => {
+			var count = Program.Print.Push (new Action (() => {
 				Console.Write (padding);
 				Program.ColorWrite ("Type", ConsoleColor.Green);
 				Console.WriteLine ($" {GetTypeFullname (reader1, type1)}");
@@ -330,14 +315,14 @@ namespace apkdiff {
 
 			CompareTypeDictionaries (nTypes1, nTypes2, padding, true);
 
-			PopHeader (count);
+			Program.Print.Pop (count);
 		}
 
 		void CompareTypeDictionaries (Dictionary<string, TypeDefinition> types1, Dictionary<string, TypeDefinition> types2, string padding, bool compareNested)
 		{
 			foreach (var pair in types1) {
 				if (!types2.ContainsKey (pair.Key)) {
-					PrintHeader ();
+					Program.Print.Invoke ();
 					Console.WriteLine ($"{padding}  -             Type {pair.Key}");
 				} else {
 					var type = types1 [pair.Key];
@@ -348,7 +333,7 @@ namespace apkdiff {
 
 			foreach (var pair in types2) {
 				if (!types1.ContainsKey (pair.Key)) {
-					PrintHeader ();
+					Program.Print.Invoke ();
 					Console.WriteLine ($"{padding}  +             Type {pair.Key}");
 				}
 			}
@@ -370,7 +355,7 @@ namespace apkdiff {
 		{
 			foreach (var key in col1) {
 				if (!col2.Contains (key)) {
-					PrintHeader ();
+					Program.Print.Invoke ();
 					Console.Write ($"{padding}  ");
 					Program.ColorWrite ("-", ConsoleColor.Green);
 					Console.Write ($"             ");
@@ -381,7 +366,7 @@ namespace apkdiff {
 
 			foreach (var key in col2) {
 				if (!col1.Contains (key)) {
-					PrintHeader ();
+					Program.Print.Invoke ();
 					Console.Write ($"{padding}  ");
 					Program.ColorWrite ("+", ConsoleColor.Red);
 					Console.Write ($"             ");
@@ -389,14 +374,6 @@ namespace apkdiff {
 					Console.WriteLine ($" {key}");
 				}
 			}
-		}
-
-		void PrintHeader ()
-		{
-			foreach (var d in headers)
-				d.DynamicInvoke ();
-
-			headers.Clear ();
 		}
 	}
 }
