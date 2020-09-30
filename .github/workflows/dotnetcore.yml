@@ -42,8 +42,9 @@ jobs:
         nuget push adiff\nupkg\*.nupkg -Source "GPR" -SkipDuplicate
         nuget push apkdiff\nupkg\*.nupkg -Source "GPR" -SkipDuplicate
     - name: Publish to nuget
-      run: dotnet nuget push adiff\nupkg\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --no-symbols --skip-duplicate --source "https://api.nuget.org/v3/index.json"
-      run: dotnet nuget push apkdiff\nupkg\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --no-symbols --skip-duplicate --source "https://api.nuget.org/v3/index.json"
+      run: |
+        dotnet nuget push adiff\nupkg\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --no-symbols --skip-duplicate --source "https://api.nuget.org/v3/index.json"
+        dotnet nuget push apkdiff\nupkg\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --no-symbols --skip-duplicate --source "https://api.nuget.org/v3/index.json"
 
 
 
