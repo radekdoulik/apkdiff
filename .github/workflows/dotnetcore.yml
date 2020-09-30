@@ -31,10 +31,10 @@ jobs:
     - name: Artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: NuGet
+        name: NuGets
         path: |
-          adiff/nupkg
-          apkdiff/nupkg
+          adiff\nupkg\*.nupkg
+          apkdiff\nupkg\*.nupkg
     - name: Setup NuGet
       uses: nuget/setup-nuget@v1
     - name: Publish to github
