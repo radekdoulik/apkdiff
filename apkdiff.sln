@@ -1,7 +1,10 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "apkdiff", "apkdiff.csproj", "{76932AAD-6BD1-43BE-8E86-B5EA965171A2}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "apkdiff", "apkdiff\apkdiff.csproj", "{76932AAD-6BD1-43BE-8E86-B5EA965171A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "adiff", "adiff\adiff.csproj", "{CDD36305-AFEE-4B76-967E-9C4327B0D6F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,5 +16,15 @@ Global
 		{76932AAD-6BD1-43BE-8E86-B5EA965171A2}.Debug|AnyCPU.Build.0 = Debug|Any CPU
 		{76932AAD-6BD1-43BE-8E86-B5EA965171A2}.Release|AnyCPU.ActiveCfg = Release|Any CPU
 		{76932AAD-6BD1-43BE-8E86-B5EA965171A2}.Release|AnyCPU.Build.0 = Release|Any CPU
+		{CDD36305-AFEE-4B76-967E-9C4327B0D6F7}.Debug|AnyCPU.ActiveCfg = Debug|Any CPU
+		{CDD36305-AFEE-4B76-967E-9C4327B0D6F7}.Debug|AnyCPU.Build.0 = Debug|Any CPU
+		{CDD36305-AFEE-4B76-967E-9C4327B0D6F7}.Release|AnyCPU.ActiveCfg = Release|Any CPU
+		{CDD36305-AFEE-4B76-967E-9C4327B0D6F7}.Release|AnyCPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7EE16AC1-917C-4118-BCA6-971759805B47}
 	EndGlobalSection
 EndGlobal

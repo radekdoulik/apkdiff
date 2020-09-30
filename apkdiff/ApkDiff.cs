@@ -1,28 +1,28 @@
-﻿using System;
+﻿using Mono.Options;
+using System;
 using System.IO;
-using Mono.Options;
 
 using static System.Console;
 
-namespace apkdiff {
-	class Program {
-		static readonly string Name = "apkdiff";
-
+namespace apkdiff
+{
+	class ApkDiff : Program
+	{
 		public static string Comment;
 		public static bool SaveDescriptions;
 		public static string SaveDescription1, SaveDescription2;
-		public static bool Verbose;
 
 		public static long AssemblyRegressionThreshold;
 		public static long ApkRegressionThreshold;
 		public static int RegressionCount;
 
-		public static PrintStack Print { get; private set; }
+		static ApkDiff ()
+		{
+			Name = nameof (apkdiff);
+		}
 
 		public static void Main (string [] args)
 		{
-			Print = new PrintStack ();
-
 			var (path1, path2) = ProcessArguments (args);
 
 			var desc1 = ApkDescription.Load (path1, SaveDescription1);
@@ -34,7 +34,7 @@ namespace apkdiff {
 
 				if (ApkRegressionThreshold != 0 && (desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
 					Error ($"PackageSize increase {desc2.PackageSize - desc1.PackageSize:#,0} is {desc2.PackageSize - desc1.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
-					RegressionCount ++;
+					RegressionCount++;
 				}
 			}
 
@@ -110,25 +110,5 @@ namespace apkdiff {
 
 			return (remaining [0], remaining.Count > 1 ? remaining [1] : null);
 		}
-
-		static void ColorMessage (string message, ConsoleColor color, TextWriter writer, bool writeLine = true)
-		{
-			ForegroundColor = color;
-
-			if (writeLine)
-				writer.WriteLine (message);
-			else
-				writer.Write (message);
-
-			ResetColor ();
-		}
-
-		public static void ColorWriteLine (string message, ConsoleColor color) => ColorMessage (message, color, Out);
-
-		public static void ColorWrite (string message, ConsoleColor color) => ColorMessage (message, color, Out, false);
-
-		public static void Error (string message) => ColorMessage ($"Error: {Name}: {message}", ConsoleColor.Red, Console.Error);
-
-		public static void Warning (string message) => ColorMessage ($"Warning: {Name}: {message}", ConsoleColor.Yellow, Console.Error);
 	}
 }

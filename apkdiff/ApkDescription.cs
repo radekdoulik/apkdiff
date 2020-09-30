@@ -80,7 +80,7 @@ namespace apkdiff {
 					Program.ColorWriteLine ($"  {entry.Size,12} {name}", ConsoleColor.Gray);
 			}
 
-			if (Program.SaveDescriptions) {
+			if (ApkDiff.SaveDescriptions) {
 				var descPath = saveDescriptionPath ?? Path.ChangeExtension (path, Path.GetExtension (path) + "desc");
 
 				Program.ColorWriteLine ($"Saving apk description to '{descPath}'", ConsoleColor.Yellow);
@@ -100,7 +100,7 @@ namespace apkdiff {
 
 		void SaveDescription (string path)
 		{
-			Comment = Program.Comment;
+			Comment = ApkDiff.Comment;
 
 			using (var writer = File.CreateText (path)) {
 				new Newtonsoft.Json.JsonSerializer () { Formatting = Newtonsoft.Json.Formatting.Indented }.Serialize (writer, this);
@@ -135,7 +135,7 @@ namespace apkdiff {
 
 		void AddToTotal (string entry, long size)
 		{
-			var entryDiff = EntryDiff.ForExtension (Path.GetExtension (entry));
+			var entryDiff = ForExtension (Path.GetExtension (entry));
 			if (entryDiff == null)
 				return;
 
@@ -148,9 +148,23 @@ namespace apkdiff {
 			}
 		}
 
+		public static EntryDiff ForExtension (string extension)
+		{
+			switch (extension) {
+				case ".dll":
+					return new AssemblyDiff ();
+				case ".so":
+					return new SharedLibraryDiff ();
+				case ".dex":
+					return new DexDiff ();
+			}
+
+			return null;
+		}
+
 		bool AddToDifference (string entry, long diff, out EntryDiff entryDiff)
 		{
-			entryDiff = EntryDiff.ForExtension (Path.GetExtension (entry));
+			entryDiff = ForExtension (Path.GetExtension (entry));
 
 			if (entryDiff == null)
 				return false;
@@ -210,9 +224,9 @@ namespace apkdiff {
 				if (!AddToDifference (diff.Key, diff.Value, out entryDiff))
 					continue;
 
-				if (Program.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > Program.AssemblyRegressionThreshold) {
-					Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - Program.AssemblyRegressionThreshold:#,0} bytes more than the threshold {Program.AssemblyRegressionThreshold:#,0}.");
-					Program.RegressionCount ++;
+				if (ApkDiff.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > ApkDiff.AssemblyRegressionThreshold) {
+					Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
+					ApkDiff.RegressionCount ++;
 				}
 
 				if (comparingApks && !single)

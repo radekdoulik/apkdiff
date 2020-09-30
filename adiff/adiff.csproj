@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\apkdiff\AssemblyDiff.cs" Link="AssemblyDiff.cs" />
+    <Compile Include="..\apkdiff\EntryDiff.cs" Link="EntryDiff.cs" />
+    <Compile Include="..\apkdiff\GenericContext.cs" Link="GenericContext.cs" />
+    <Compile Include="..\apkdiff\PrintStack.cs" Link="PrintStack.cs" />
+    <Compile Include="..\apkdiff\Program.cs" Link="Program.cs" />
+    <Compile Include="..\apkdiff\SignatureDecoder.cs" Link="SignatureDecoder.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.1.11" />
+    <PackageReference Include="Mono.Options" Version="6.6.0.161" />
+    <PackageReference Include="System.Reflection.Metadata" Version="1.8.0" />
+  </ItemGroup>
+
+</Project>
