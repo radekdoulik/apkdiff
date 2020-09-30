@@ -1,8 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <Company>Microsoft Corporation</Company>
+    <Copyright>2020 Microsoft Corporation</Copyright>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>0.0.4</Version>
+    <Authors>Radek Doulik</Authors>
+    <OutputType>Exe</OutputType>
+    <PlatformTarget>x64</PlatformTarget>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>adiff</ToolCommandName>
+    <PackageOutputPath>nupkg</PackageOutputPath>
+    <PackageDescription>A tool to compare .NET assemblies</PackageDescription>
+    <RepositoryUrl>https://github.com/radekdoulik/adiff</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
