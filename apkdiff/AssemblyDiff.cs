@@ -372,12 +372,7 @@ namespace apkdiff {
 					if (!compare)
 						continue;
 
-					Program.Print.Invoke ();
-					Console.Write ($"{padding}  ");
-					Program.ColorWrite ("-", ConsoleColor.Green);
-					Console.Write ("             ");
-					Program.ColorWrite ("Type", ConsoleColor.Green);
-					Console.WriteLine ($" {pair.Key}");
+					ColorAPILine (padding, "-", ConsoleColor.Green, "Type", ConsoleColor.Green, pair.Key);
 				} else {
 					if (compare)
 						CompareTypes (type, types2 [pair.Key], padding + "  ");
@@ -389,12 +384,7 @@ namespace apkdiff {
 					if (!compareNested && pair.Value.IsNested)
 						continue;
 
-					Program.Print.Invoke ();
-					Console.Write ($"{padding}  ");
-					Program.ColorWrite ("+", ConsoleColor.Red);
-					Console.Write ("             ");
-					Program.ColorWrite ("Type", ConsoleColor.Green);
-					Console.WriteLine ($" {pair.Key}");
+					ColorAPILine (padding, "+", ConsoleColor.Red, "Type", ConsoleColor.Green, pair.Key);
 				}
 			}
 		}
@@ -411,28 +401,26 @@ namespace apkdiff {
 			return dict;
 		}
 
-		void CompareKeys (ICollection<string> col1, ICollection<string> col2, string name, string padding)
+		void ColorAPILine (string padding1, string sign, ConsoleColor signColor, string label, ConsoleColor labelColor, string name)
+		{
+			Program.Print.Invoke ();
+			Console.Write ($"{padding1}  ");
+			Program.ColorWrite (sign, signColor);
+			Console.Write ("             ");
+			Program.ColorWrite (label, labelColor);
+			Console.WriteLine ($" {name}");
+		}
+
+		void CompareKeys (ICollection<string> col1, ICollection<string> col2, string label, string padding)
 		{
 			foreach (var key in col1) {
-				if (!col2.Contains (key)) {
-					Program.Print.Invoke ();
-					Console.Write ($"{padding}  ");
-					Program.ColorWrite ("-", ConsoleColor.Green);
-					Console.Write ($"             ");
-					Program.ColorWrite (name, ConsoleColor.Green);
-					Console.WriteLine ($" {key}");
-				}
+				if (!col2.Contains (key))
+					ColorAPILine (padding, "-", ConsoleColor.Green, label, ConsoleColor.Green, key);
 			}
 
 			foreach (var key in col2) {
-				if (!col1.Contains (key)) {
-					Program.Print.Invoke ();
-					Console.Write ($"{padding}  ");
-					Program.ColorWrite ("+", ConsoleColor.Red);
-					Console.Write ($"             ");
-					Program.ColorWrite (name, ConsoleColor.Green);
-					Console.WriteLine ($" {key}");
-				}
+				if (!col1.Contains (key))
+					ColorAPILine (padding, "+", ConsoleColor.Red, label, ConsoleColor.Green, key);
 			}
 		}
 	}
