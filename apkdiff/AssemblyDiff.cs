@@ -22,22 +22,7 @@ namespace apkdiff {
 		TypeDefinition GetTypeDefinition (MetadataReader reader, TypeDefinitionHandle handle, out string fullName)
 		{
 			var typeDef = reader.GetTypeDefinition (handle);
-			var name = reader.GetString (typeDef.Name);
-			var nspace = reader.GetString (typeDef.Namespace);
-
-			fullName = "";
-
-			if (typeDef.IsNested) {
-				string declTypeFullName;
-
-				GetTypeDefinition (reader, typeDef.GetDeclaringType (), out declTypeFullName);
-				fullName += declTypeFullName + "/";
-			}
-
-			if (!string.IsNullOrEmpty (nspace))
-				fullName += nspace + ".";
-
-			fullName += name;
+			fullName = GetTypeFullname (reader, typeDef);
 
 			return typeDef;
 		}
@@ -395,7 +380,7 @@ namespace apkdiff {
 
 			foreach (var nthd in td.GetNestedTypes ()) {
 				var ntd = reader.GetTypeDefinition (nthd);
-				dict [reader.GetString (ntd.Name)] = ntd;
+				dict [GetTypeFullname (reader, ntd)] = ntd;
 			}
 
 			return dict;
