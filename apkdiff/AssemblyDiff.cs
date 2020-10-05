@@ -365,20 +365,36 @@ namespace apkdiff {
 		void CompareTypeDictionaries (Dictionary<string, TypeDefinition> types1, Dictionary<string, TypeDefinition> types2, string padding, bool compareNested)
 		{
 			foreach (var pair in types1) {
+				var type = types1 [pair.Key];
+				var compare = compareNested || !type.IsNested;
+
 				if (!types2.ContainsKey (pair.Key)) {
+					if (!compare)
+						continue;
+
 					Program.Print.Invoke ();
-					Console.WriteLine ($"{padding}  -             Type {pair.Key}");
+					Console.Write ($"{padding}  ");
+					Program.ColorWrite ("-", ConsoleColor.Green);
+					Console.Write ("             ");
+					Program.ColorWrite ("Type", ConsoleColor.Green);
+					Console.WriteLine ($" {pair.Key}");
 				} else {
-					var type = types1 [pair.Key];
-					if (compareNested || !type.IsNested)
+					if (compare)
 						CompareTypes (type, types2 [pair.Key], padding + "  ");
 				}
 			}
 
 			foreach (var pair in types2) {
 				if (!types1.ContainsKey (pair.Key)) {
+					if (!compareNested && pair.Value.IsNested)
+						continue;
+
 					Program.Print.Invoke ();
-					Console.WriteLine ($"{padding}  +             Type {pair.Key}");
+					Console.Write ($"{padding}  ");
+					Program.ColorWrite ("+", ConsoleColor.Red);
+					Console.Write ("             ");
+					Program.ColorWrite ("Type", ConsoleColor.Green);
+					Console.WriteLine ($" {pair.Key}");
 				}
 			}
 		}
