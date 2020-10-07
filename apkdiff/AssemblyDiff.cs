@@ -10,6 +10,9 @@ using K4os.Compression.LZ4;
 namespace apkdiff {
 	public class AssemblyDiff : EntryDiff {
 
+		PEReader per1;
+		PEReader per2;
+
 		MetadataReader reader1;
 		MetadataReader reader2;
 
@@ -76,12 +79,48 @@ namespace apkdiff {
 			}
 		}
 
+		void CompareManifestResources (string padding)
+		{
+			if (!per1.IsEntireImageAvailable || !per2.IsEntireImageAvailable)
+				return;
+
+			var res1 = GetResources (reader1, per1);
+			var res2 = GetResources (reader2, per2);
+
+			CompareSizes (res1, res2, "Resource", padding);
+		}
+
+		private Dictionary<string, int> GetResources (MetadataReader reader, PEReader per)
+		{
+			var resources = new Dictionary<string, int> ();
+
+			per.PEHeaders.TryGetDirectoryOffset (per1.PEHeaders.CorHeader.ResourcesDirectory, out int startOffset);
+
+			if (startOffset < 0)
+				return resources;
+
+			var image = per.GetEntireImage ();
+			foreach (var mh in reader.ManifestResources) {
+				var mr = reader.GetManifestResource (mh);
+				if (!mr.Implementation.IsNil)
+					continue;
+
+				var br = image.GetReader (startOffset + (int)mr.Offset, 4);
+				var size = br.ReadInt32 ();
+				resources [reader.GetString (mr.Name)] = size;
+			}
+
+			return resources;
+		}
+
 		public override void Compare (string file, string other, string padding)
 		{
-			using (var per1 = GetPEReader (file, padding)) {
-				using (var per2 = GetPEReader (other, padding)) {
+			using (per1 = GetPEReader (file, padding)) {
+				using (per2 = GetPEReader (other, padding)) {
 					reader1 = per1.GetMetadataReader ();
 					reader2 = per2.GetMetadataReader ();
+
+					CompareManifestResources (padding);
 
 					var types1 = new Dictionary<string, TypeDefinition> (reader1.TypeDefinitions.Count);
 					var types2 = new Dictionary<string, TypeDefinition> (reader2.TypeDefinitions.Count);
@@ -406,6 +445,19 @@ namespace apkdiff {
 			foreach (var key in col2) {
 				if (!col1.Contains (key))
 					ColorAPILine (padding, "+", ConsoleColor.Red, label, ConsoleColor.Green, key);
+			}
+		}
+
+		void CompareSizes (Dictionary<string, int> col1, Dictionary<string, int> col2, string label, string padding)
+		{
+			foreach (var p in col1) {
+				if (!col2.ContainsKey (p.Key))
+					ColorAPILine (padding, "-", ConsoleColor.Green, label, ConsoleColor.Green, p.Key);
+			}
+
+			foreach (var p in col2) {
+				if (!col1.ContainsKey (p.Key))
+					ColorAPILine (padding, "+", ConsoleColor.Red, label, ConsoleColor.Green, p.Key);
 			}
 		}
 	}
