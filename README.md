@@ -1,5 +1,11 @@
 **apkdiff** is a tool to compare Android packages
 
+#### Installation
+
+`apkdiff` is .NET core tool. It can be installed using the `dotnet` tool:
+
+    dotnet tool install --global apkdiff
+
 #### Build status
 ![.NET Core](https://github.com/radekdoulik/apkdiff/workflows/.NET%20Core/badge.svg)
 
