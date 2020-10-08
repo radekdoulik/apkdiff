@@ -9,8 +9,6 @@
 #### Build status
 ![.NET Core](https://github.com/radekdoulik/apkdiff/workflows/.NET%20Core/badge.svg)
 
-Location of the tool included in Xamarin.Android: https://github.com/xamarin/xamarin-android/tree/master/tools/apkdiff
-
 ```
 Usage: apkdiff.exe OPTIONS* <package1.[apk|aab][desc]> [<package2.[apk|aab][desc]>]
 
