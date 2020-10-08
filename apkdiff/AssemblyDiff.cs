@@ -94,7 +94,7 @@ namespace apkdiff {
 		{
 			var resources = new Dictionary<string, int> ();
 
-			per.PEHeaders.TryGetDirectoryOffset (per1.PEHeaders.CorHeader.ResourcesDirectory, out int startOffset);
+			per.PEHeaders.TryGetDirectoryOffset (per.PEHeaders.CorHeader.ResourcesDirectory, out int startOffset);
 
 			if (startOffset < 0)
 				return resources;
