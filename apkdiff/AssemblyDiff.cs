@@ -102,12 +102,13 @@ namespace apkdiff {
 			var image = per.GetEntireImage ();
 			foreach (var mh in reader.ManifestResources) {
 				var mr = reader.GetManifestResource (mh);
+				var name = reader.GetString (mr.Name);
 				if (!mr.Implementation.IsNil)
 					continue;
 
 				var br = image.GetReader (startOffset + (int)mr.Offset, 4);
 				var size = br.ReadInt32 ();
-				resources [reader.GetString (mr.Name)] = size;
+				resources [name] = size;
 			}
 
 			return resources;
@@ -425,12 +426,17 @@ namespace apkdiff {
 			return dict;
 		}
 
-		void ColorAPILine (string padding1, string sign, ConsoleColor signColor, string label, ConsoleColor labelColor, string name)
+		void ColorAPILine (string padding1, string sign, ConsoleColor signColor, string label, ConsoleColor labelColor, string name, bool printSizeDifference = false, int sizeDifference = 0)
 		{
 			Program.Print.Invoke ();
 			Console.Write ($"{padding1}  ");
 			Program.ColorWrite (sign, signColor);
-			Console.Write ("             ");
+
+			if (printSizeDifference)
+				Program.ColorWrite ($"{Math.Abs (sizeDifference),12:#,0} ", signColor);
+			else
+				Console.Write ("             ");
+
 			Program.ColorWrite (label, labelColor);
 			Console.WriteLine ($" {name}");
 		}
@@ -453,6 +459,12 @@ namespace apkdiff {
 			foreach (var p in col1) {
 				if (!col2.ContainsKey (p.Key))
 					ColorAPILine (padding, "-", ConsoleColor.Green, label, ConsoleColor.Green, p.Key);
+				else {
+					var s1 = p.Value;
+					var s2 = col2 [p.Key];
+					if (s1 != s2)
+						ColorAPILine (padding, s1 > s2 ? "-" : "+", s1 > s2 ? ConsoleColor.Green : ConsoleColor.Red, label, ConsoleColor.Green, p.Key, true, s2 - s1);
+				}
 			}
 
 			foreach (var p in col2) {
