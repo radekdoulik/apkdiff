@@ -16,6 +16,9 @@ namespace apkdiff {
 		MetadataReader reader1;
 		MetadataReader reader2;
 
+		FileInfo fileInfo1;
+		FileInfo fileInfo2;
+
 		public AssemblyDiff ()
 		{
 		}
@@ -116,6 +119,9 @@ namespace apkdiff {
 
 		public override void Compare (string file, string other, string padding)
 		{
+			fileInfo1 = new FileInfo (file);
+			fileInfo2 = new FileInfo (other);
+
 			using (per1 = GetPEReader (file, padding)) {
 				using (per2 = GetPEReader (other, padding)) {
 					reader1 = per1.GetMetadataReader ();
@@ -471,6 +477,14 @@ namespace apkdiff {
 				if (!col1.ContainsKey (p.Key))
 					ColorAPILine (padding, "+", ConsoleColor.Red, label, ConsoleColor.Green, p.Key);
 			}
+		}
+
+		public void Summary ()
+		{
+			Program.ColorWriteLine ("Summary:", ConsoleColor.Green);
+			Program.PrintDifference ("File size", fileInfo2.Length - fileInfo1.Length, fileInfo1.Length);
+			Program.PrintDifference ("Metadata size", reader2.MetadataLength - reader1.MetadataLength, reader1.MetadataLength);
+			Program.PrintDifference ("Types count", reader2.TypeDefinitions.Count - reader1.TypeDefinitions.Count);
 		}
 	}
 }

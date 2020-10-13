@@ -167,7 +167,7 @@ namespace apkdiff {
 
 				var single = singles.Contains (diff.Key);
 
-				ApkDescription.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
+				Program.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
 			}
 		}
 
@@ -207,7 +207,7 @@ namespace apkdiff {
 
 				var single = singles.Contains (diff.Key);
 
-				ApkDescription.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
+				Program.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
 			}
 		}
 

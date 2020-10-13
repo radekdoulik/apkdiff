@@ -34,5 +34,33 @@ namespace apkdiff {
 		public static void Error (string message) => ColorMessage ($"Error: {Name}: {message}", ConsoleColor.Red, Console.Error);
 
 		public static void Warning (string message) => ColorMessage ($"Warning: {Name}: {message}", ConsoleColor.Yellow, Console.Error);
+
+		static public void PrintDifference (string key, long diff, long orig, string comment = null, string padding = null)
+		{
+			var color = PrintDifferenceStart (key, diff, comment, padding);
+
+			if (orig != 0)
+				Program.ColorWrite ($" {(float)diff / orig:0.00%} (of {orig:#,0})", color);
+
+			Console.WriteLine ();
+		}
+
+		static ConsoleColor PrintDifferenceStart (string key, long diff, string comment = null, string padding = null)
+		{
+			var color = diff == 0 ? ConsoleColor.Gray : diff > 0 ? ConsoleColor.Red : ConsoleColor.Green;
+			Program.ColorWrite ($"{padding}  {diff:+;-;+}{Math.Abs (diff),12:#,0}", color);
+			Program.ColorWrite ($" {key}", ConsoleColor.Gray);
+			Program.ColorWrite (comment, color);
+
+			return color;
+		}
+
+		static public void PrintDifference (string key, long diff, string comment = null, string padding = null)
+		{
+			PrintDifferenceStart (key, diff, comment, padding);
+			Console.WriteLine ();
+		}
+
+
 	}
 }

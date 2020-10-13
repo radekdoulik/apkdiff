@@ -107,32 +107,6 @@ namespace apkdiff {
 			}
 		}
 
-		static ConsoleColor PrintDifferenceStart (string key, long diff, string comment = null, string padding = null)
-		{
-			var color = diff == 0 ? ConsoleColor.Gray : diff > 0 ? ConsoleColor.Red : ConsoleColor.Green;
-			Program.ColorWrite ($"{padding}  {diff:+;-;+}{Math.Abs (diff),12:#,0}", color);
-			Program.ColorWrite ($" {key}", ConsoleColor.Gray);
-			Program.ColorWrite (comment, color);
-
-			return color;
-		}
-
-		static public void PrintDifference (string key, long diff, string comment = null, string padding = null)
-		{
-			PrintDifferenceStart (key, diff, comment, padding);
-			Console.WriteLine ();
-		}
-
-		static public void PrintDifference (string key, long diff, long orig, string comment = null, string padding = null)
-		{
-			var color = PrintDifferenceStart (key, diff, comment, padding);
-
-			if (orig != 0)
-				Program.ColorWrite ($" {(float)diff/orig:0.00%} (of {orig:#,0})", color);
-
-			Console.WriteLine ();
-		}
-
 		void AddToTotal (string entry, long size)
 		{
 			var entryDiff = ForExtension (Path.GetExtension (entry));
@@ -213,7 +187,7 @@ namespace apkdiff {
 			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
 				var single = singles.Contains (diff.Key);
 
-				Action pa = new Action (() => PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null));
+				Action pa = new Action (() => Program.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null));
 				int count = -1;
 				if (diff.Value == 0)
 					count = Program.Print.Push (pa);
@@ -240,9 +214,9 @@ namespace apkdiff {
 				Program.ColorWriteLine ($"  apk1: {PackageSize,12}  {PackagePath}\n  apk2: {other.PackageSize,12}  {other.PackagePath}", ConsoleColor.Gray);
 
 			foreach (var total in totalDifferences)
-				PrintDifference (total.Key, total.Value.Difference, total.Value.OriginalTotal);
+				Program.PrintDifference (total.Key, total.Value.Difference, total.Value.OriginalTotal);
 
-			PrintDifference ("Package size difference", other.PackageSize - PackageSize, PackageSize);
+			Program.PrintDifference ("Package size difference", other.PackageSize - PackageSize, PackageSize);
 		}
 
 		void CompareEntries (KeyValuePair<string, FileProperties> entry, KeyValuePair<string, FileProperties> other, ApkDescription otherApk, EntryDiff diff)

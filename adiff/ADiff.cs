@@ -19,7 +19,10 @@ namespace adiff
 
 			Program.Print.Push (new Action (() => Program.ColorWriteLine ($"Compare {path1} with {path2}", ConsoleColor.Yellow)));
 
-			new AssemblyDiff ().Compare (path1, path2, "");
+			var adiff = new AssemblyDiff ();
+
+			adiff.Compare (path1, path2, "");
+			adiff.Summary ();
 		}
 
 		static (string, string) ProcessArguments (string [] args)
