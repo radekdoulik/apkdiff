@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using System.Text.RegularExpressions;
 using K4os.Compression.LZ4;
 
 namespace apkdiff {
@@ -19,8 +20,14 @@ namespace apkdiff {
 		FileInfo fileInfo1;
 		FileInfo fileInfo2;
 
-		public AssemblyDiff ()
+		Regex regex;
+
+		public AssemblyDiff (string typesPattern = null)
 		{
+			if (typesPattern == null)
+				return;
+
+			regex = new Regex (typesPattern);
 		}
 
 		public override string Name { get { return "Assemblies"; } }
@@ -395,9 +402,15 @@ namespace apkdiff {
 
 		void CompareTypeDictionaries (Dictionary<string, TypeDefinition> types1, Dictionary<string, TypeDefinition> types2, string padding, bool compareNested)
 		{
+			var origRegex = regex;
 			foreach (var pair in types1) {
 				var type = types1 [pair.Key];
-				var compare = compareNested || !type.IsNested;
+				var compare = compareNested || !type.IsNested || regex != null;
+
+				if (regex != null && !regex.IsMatch (pair.Key))
+					continue;
+
+				regex = null;
 
 				if (!types2.ContainsKey (pair.Key)) {
 					if (!compare)
@@ -408,11 +421,20 @@ namespace apkdiff {
 					if (compare)
 						CompareTypes (type, types2 [pair.Key], padding + "  ");
 				}
+
+				regex = origRegex;
 			}
 
+			regex = origRegex;
+
 			foreach (var pair in types2) {
+				if (regex != null && !regex.IsMatch (pair.Key))
+					continue;
+
+				regex = null;
+
 				if (!types1.ContainsKey (pair.Key)) {
-					if (!compareNested && pair.Value.IsNested)
+					if (!compareNested && pair.Value.IsNested && origRegex == null)
 						continue;
 
 					ColorAPILine (padding, "+", ConsoleColor.Red, "Type", ConsoleColor.Green, pair.Key);

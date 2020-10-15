@@ -19,11 +19,13 @@ namespace adiff
 
 			Program.Print.Push (new Action (() => Program.ColorWriteLine ($"Compare {path1} with {path2}", ConsoleColor.Yellow)));
 
-			var adiff = new AssemblyDiff ();
+			var adiff = new AssemblyDiff (typesPattern);
 
 			adiff.Compare (path1, path2, "");
 			adiff.Summary ();
 		}
+
+		static string typesPattern;
 
 		static (string, string) ProcessArguments (string [] args)
 		{
@@ -40,6 +42,9 @@ namespace adiff
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },
+				{ "t|type=",
+					"Process only types matching regex {PATTERN}",
+				  v => typesPattern = v },
 				{ "v|verbose",
 					"Output information about progress during the run of the tool",
 				  v => Verbose = true },
