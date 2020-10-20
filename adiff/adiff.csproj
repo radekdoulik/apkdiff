@@ -12,7 +12,7 @@
     <ToolCommandName>adiff</ToolCommandName>
     <PackageOutputPath>nupkg</PackageOutputPath>
     <PackageDescription>A tool to compare .NET assemblies</PackageDescription>
-    <RepositoryUrl>https://github.com/radekdoulik/adiff</RepositoryUrl>
+    <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
