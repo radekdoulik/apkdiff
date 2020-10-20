@@ -17,12 +17,14 @@ namespace adiff
 		{
 			var (path1, path2) = ProcessArguments (args);
 
-			Program.Print.Push (new Action (() => Program.ColorWriteLine ($"Compare {path1} with {path2}", ConsoleColor.Yellow)));
+			var count = Program.Print.Push (new Action (() => Program.ColorWriteLine ($"Compare {path1} with {path2}", ConsoleColor.Yellow)));
 
 			var adiff = new AssemblyDiff (typesPattern);
 
 			adiff.Compare (path1, path2, "");
 			adiff.Summary ();
+
+			Program.Print.Pop (count);
 		}
 
 		static string typesPattern;
