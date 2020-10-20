@@ -4,7 +4,7 @@
     <Company>Microsoft Corporation</Company>
     <Copyright>2020 Microsoft Corporation</Copyright>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.0.5</Version>
+    <Version>$(ProductVersion)</Version>
     <Authors>Radek Doulik</Authors>
     <OutputType>Exe</OutputType>
     <PlatformTarget>x64</PlatformTarget>
