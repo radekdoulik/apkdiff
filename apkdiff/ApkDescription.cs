@@ -195,16 +195,15 @@ namespace apkdiff {
 					pa.DynamicInvoke ();
 
 				EntryDiff entryDiff;
-				if (!AddToDifference (diff.Key, diff.Value, out entryDiff))
-					continue;
+				if (AddToDifference (diff.Key, diff.Value, out entryDiff)) {
+					if (ApkDiff.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > ApkDiff.AssemblyRegressionThreshold) {
+						Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
+						ApkDiff.RegressionCount++;
+					}
 
-				if (ApkDiff.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > ApkDiff.AssemblyRegressionThreshold) {
-					Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
-					ApkDiff.RegressionCount ++;
+					if (comparingApks && !single)
+						CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
 				}
-
-				if (comparingApks && !single)
-					CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
 
 				Program.Print.Pop (count);
 			}
