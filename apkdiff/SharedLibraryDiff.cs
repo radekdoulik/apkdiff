@@ -136,8 +136,6 @@ namespace apkdiff {
 			var scs1 = ParseSizeOutput (RunSizeCmd (file));
 			var scs2 = ParseSizeOutput (RunSizeCmd (other));
 
-			Program.ColorWriteLine ($"{padding}                Section size difference", ConsoleColor.Yellow);
-
 			var differences = new Dictionary<string, long> ();
 			var singles = new HashSet<string> ();
 
@@ -161,22 +159,25 @@ namespace apkdiff {
 				singles.Add (key);
 			}
 
+			var count = Program.Print.Push (() => Program.ColorWriteLine ($"{padding}                Section size difference", ConsoleColor.Yellow));
+
 			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
 				if (diff.Value == 0)
 					continue;
 
 				var single = singles.Contains (diff.Key);
 
+				Program.Print.Invoke ();
 				Program.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
 			}
+
+			Program.Print.Pop (count);
 		}
 
 		void CompareSymbols (string file, string other, string padding)
 		{
 			var sym1 = ParseNMOutput (RunNMCmd (file));
 			var sym2 = ParseNMOutput (RunNMCmd (other));
-
-			Program.ColorWriteLine ($"{padding}                Symbol size difference", ConsoleColor.Yellow);
 
 			var differences = new Dictionary<string, long> ();
 			var singles = new HashSet<string> ();
@@ -201,14 +202,19 @@ namespace apkdiff {
 				singles.Add (key);
 			}
 
+			var count = Program.Print.Push (() => Program.ColorWriteLine ($"{padding}                Symbol size difference", ConsoleColor.Yellow));
+
 			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
 				if (diff.Value == 0)
 					continue;
 
 				var single = singles.Contains (diff.Key);
 
+				Program.Print.Invoke ();
 				Program.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null, padding);
 			}
+
+			Program.Print.Pop (count);
 		}
 
 		public override void Compare (string file, string other, string padding)
