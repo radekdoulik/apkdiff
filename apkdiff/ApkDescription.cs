@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 using System.Runtime.Serialization;
 using Xamarin.Tools.Zip;
+using System.Text.RegularExpressions;
 
 namespace apkdiff {
 
@@ -28,6 +29,8 @@ namespace apkdiff {
 		readonly Dictionary<string, FileProperties> Entries = new Dictionary<string, FileProperties> ();
 
 		Dictionary<string, (long Difference, long OriginalTotal)> totalDifferences = new Dictionary<string, (long, long)> ();
+
+		Regex entriesRegex;
 
 		public static ApkDescription Load (string path, string saveDescriptionPath = null)
 		{
@@ -154,12 +157,19 @@ namespace apkdiff {
 			return true;
 		}
 
-		public void Compare (ApkDescription other)
+		bool ShouldCompareEntry (string entry)
+		{
+			return entriesRegex == null || entriesRegex.IsMatch (entry);
+		}
+
+		public void Compare (ApkDescription other, string entriesPattern = null)
 		{
 			var keys = Entries.Keys.Union (other.Entries.Keys);
 			var differences = new Dictionary<string, long> ();
 			var singles = new HashSet<string> ();
 			var comparingApks = Archive != null && other.Archive != null;
+
+			entriesRegex = string.IsNullOrEmpty (entriesPattern) ? null : new Regex (entriesPattern);
 
 			Program.ColorWriteLine ("Size difference in bytes ([*1] apk1 only, [*2] apk2 only):", ConsoleColor.Yellow);
 
@@ -173,7 +183,8 @@ namespace apkdiff {
 					singles.Add (key);
 				}
 
-				AddToTotal (key, Entries [key].Size);
+				if (ShouldCompareEntry (key))
+					AddToTotal (key, Entries [key].Size);
 			}
 
 			foreach (var key in other.Entries.Keys) {
@@ -185,6 +196,9 @@ namespace apkdiff {
 			}
 
 			foreach (var diff in differences.OrderByDescending (v => v.Value)) {
+				if (!ShouldCompareEntry (diff.Key))
+					continue;
+
 				var single = singles.Contains (diff.Key);
 
 				Action pa = new Action (() => Program.PrintDifference (diff.Key, diff.Value, single ? $" *{(diff.Value > 0 ? 2 : 1)}" : null));

@@ -30,7 +30,7 @@ namespace apkdiff
 			if (path2 != null) {
 				var desc2 = ApkDescription.Load (path2, SaveDescription2);
 
-				desc1.Compare (desc2);
+				desc1.Compare (desc2, entriesPattern);
 
 				if (ApkRegressionThreshold != 0 && (desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
 					Error ($"PackageSize increase {desc2.PackageSize - desc1.PackageSize:#,0} is {desc2.PackageSize - desc1.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
@@ -43,6 +43,8 @@ namespace apkdiff
 				Environment.Exit (3);
 			}
 		}
+
+		static string entriesPattern;
 
 		static (string, string) ProcessArguments (string [] args)
 		{
@@ -59,6 +61,9 @@ namespace apkdiff
 				{ "c|comment=",
 					"Comment to be saved inside description file",
 				  v => Comment = v },
+				{ "e|entry=",
+					"Process only entries matching regex {PATTERN}",
+				  v => entriesPattern = v },
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },
