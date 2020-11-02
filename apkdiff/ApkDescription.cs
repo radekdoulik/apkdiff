@@ -235,9 +235,6 @@ namespace apkdiff {
 			var tmpDirOther = Path.Combine (Path.GetTempPath (), Path.GetRandomFileName ());
 			var padding = "  ";
 
-			if (Program.Verbose)
-				Program.ColorWriteLine ($"{padding}Extracting '{entry.Key}' to {tmpDir} and {tmpDirOther} temporary directories", ConsoleColor.Gray);
-
 			Directory.CreateDirectory (tmpDir);
 
 			var zipEntry = Archive.ReadEntry (entry.Key, true);
@@ -245,6 +242,12 @@ namespace apkdiff {
 
 			var zipEntryOther = otherApk.Archive.ReadEntry (other.Key, true);
 			zipEntryOther.Extract (tmpDirOther, other.Key);
+
+			if (Program.Verbose) {
+				Program.ColorWriteLine ($"{padding}Extracted '{entry.Key}' compression method [{zipEntry.CompressionMethod}] to {tmpDir} and {tmpDirOther} temporary directories", ConsoleColor.Gray);
+				if (zipEntry.CompressionMethod != zipEntryOther.CompressionMethod)
+					Program.ColorWriteLine ($"{padding}  Compression methods differ: [{zipEntry.CompressionMethod}]*1 and [{zipEntryOther.CompressionMethod}]*2", ConsoleColor.Yellow);
+			}
 
 			diff.Compare (Path.Combine (tmpDir, entry.Key), Path.Combine (tmpDirOther, other.Key), padding);
 
