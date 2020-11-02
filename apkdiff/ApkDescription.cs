@@ -110,19 +110,14 @@ namespace apkdiff {
 			}
 		}
 
-		void AddToTotal (string entry, long size)
+		void AddToOthersTotal (long diff, long total)
 		{
-			var entryDiff = ForExtension (Path.GetExtension (entry));
-			if (entryDiff == null)
-				return;
-
-			var diffType = entryDiff.Name;
-			if (!totalDifferences.ContainsKey (diffType))
-				totalDifferences.Add (diffType, (0, size));
-			else {
-				var info = totalDifferences [diffType];
-				totalDifferences [diffType] = (info.Difference, info.OriginalTotal + size);
-			}
+			string others = "Other entries";
+			if (totalDifferences.ContainsKey (others)) {
+				var info = totalDifferences [others];
+				totalDifferences [others] = (info.Difference + diff, info.OriginalTotal + total);
+			} else
+				totalDifferences.Add (others, (diff, total));
 		}
 
 		public static EntryDiff ForExtension (string extension)
@@ -139,22 +134,24 @@ namespace apkdiff {
 			return null;
 		}
 
-		bool AddToDifference (string entry, long diff, out EntryDiff entryDiff)
+		EntryDiff AddToTotalDifferences (string entry, long diff = 0, long total = 0)
 		{
-			entryDiff = ForExtension (Path.GetExtension (entry));
+			var entryDiff = ForExtension (Path.GetExtension (entry));
 
-			if (entryDiff == null)
-				return false;
+			if (entryDiff == null) {
+				AddToOthersTotal (diff, total);
+				return null;
+			}
 
 			var diffType = entryDiff.Name;
 			if (!totalDifferences.ContainsKey (diffType))
-				totalDifferences.Add (diffType, (diff, 0));
+				totalDifferences.Add (diffType, (diff, total));
 			else {
 				var info = totalDifferences [diffType];
-				totalDifferences [diffType] = (info.Difference + diff, info.OriginalTotal);
+				totalDifferences [diffType] = (info.Difference + diff, info.OriginalTotal + total);
 			}
 
-			return true;
+			return entryDiff;
 		}
 
 		bool ShouldCompareEntry (string entry)
@@ -184,7 +181,7 @@ namespace apkdiff {
 				}
 
 				if (ShouldCompareEntry (key))
-					AddToTotal (key, Entries [key].Size);
+					AddToTotalDifferences (key, total: Entries [key].Size);
 			}
 
 			foreach (var key in other.Entries.Keys) {
@@ -208,8 +205,8 @@ namespace apkdiff {
 				else
 					pa.DynamicInvoke ();
 
-				EntryDiff entryDiff;
-				if (AddToDifference (diff.Key, diff.Value, out entryDiff)) {
+				EntryDiff entryDiff = AddToTotalDifferences (diff.Key, diff: diff.Value);
+				if (entryDiff != null) {
 					if (ApkDiff.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > ApkDiff.AssemblyRegressionThreshold) {
 						Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
 						ApkDiff.RegressionCount++;
