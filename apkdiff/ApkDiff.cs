@@ -9,6 +9,7 @@ namespace apkdiff
 	class ApkDiff : Program
 	{
 		public static string Comment;
+		public static bool Flat;
 		public static bool SaveDescriptions;
 		public static string SaveDescription1, SaveDescription2;
 
@@ -30,7 +31,7 @@ namespace apkdiff
 			if (path2 != null) {
 				var desc2 = ApkDescription.Load (path2, SaveDescription2);
 
-				desc1.Compare (desc2, entriesPattern);
+				desc1.Compare (desc2, entriesPattern, Flat);
 
 				if (ApkRegressionThreshold != 0 && (desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
 					Error ($"PackageSize increase {desc2.PackageSize - desc1.PackageSize:#,0} is {desc2.PackageSize - desc1.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
@@ -64,6 +65,9 @@ namespace apkdiff
 				{ "e|entry=",
 					"Process only entries matching regex {PATTERN}",
 				  v => entriesPattern = v },
+				{ "f|flat",
+					"Display flat comparison of entries, without showing comparison of their content",
+				  v => Flat = true },
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },

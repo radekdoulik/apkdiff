@@ -159,7 +159,7 @@ namespace apkdiff {
 			return entriesRegex == null || entriesRegex.IsMatch (entry);
 		}
 
-		public void Compare (ApkDescription other, string entriesPattern = null)
+		public void Compare (ApkDescription other, string entriesPattern = null, bool flat = false)
 		{
 			var keys = Entries.Keys.Union (other.Entries.Keys);
 			var differences = new Dictionary<string, long> ();
@@ -212,7 +212,7 @@ namespace apkdiff {
 						ApkDiff.RegressionCount++;
 					}
 
-					if (comparingApks && !single)
+					if (!flat && comparingApks && !single)
 						CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
 				}
 
