@@ -277,7 +277,7 @@ namespace apkdiff {
 				sigErr = true;
 			}
 
-			sb.Append (sigErr ? signature.ReturnType : "SIGERR");
+			sb.Append (sigErr ? "SIGERR" : signature.ReturnType);
 			sb.Append (' ');
 			sb.Append (reader.GetString (md.Name));
 
