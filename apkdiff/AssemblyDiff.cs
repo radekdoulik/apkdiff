@@ -268,21 +268,33 @@ namespace apkdiff {
 				sb.Append ("static ");
 
 			var context = new GenericContext (md.GetGenericParameters (), td.GetGenericParameters (), reader);
-			var signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context);
 
-			sb.Append (signature.ReturnType);
+			MethodSignature<string> signature = new MethodSignature<string> ();
+			bool sigErr = false;
+			try {
+				signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context);
+			} catch (BadImageFormatException) {
+				sigErr = true;
+			}
+
+			sb.Append (sigErr ? signature.ReturnType : "SIGERR");
 			sb.Append (' ');
 			sb.Append (reader.GetString (md.Name));
 
 			sb.Append (" (");
 			var first = true;
-			foreach (var p in signature.ParameterTypes) {
-				if (first)
-					first = false;
-				else
-					sb.Append (", ");
 
-				sb.Append (p);
+			if (sigErr) {
+				sb.Append ("SIGERR");
+			} else {
+				foreach (var p in signature.ParameterTypes) {
+					if (first)
+						first = false;
+					else
+						sb.Append (", ");
+
+					sb.Append (p);
+				}
 			}
 
 			sb.Append (')');
