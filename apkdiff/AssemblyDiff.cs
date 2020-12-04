@@ -258,6 +258,8 @@ namespace apkdiff {
 			return sb.ToString ();
 		}
 
+		bool warnedAboutSigErr = false;
+
 		string GetMethodString (MetadataReader reader, TypeDefinition td, MethodDefinition md)
 		{
 			StringBuilder sb = new StringBuilder ();
@@ -275,6 +277,10 @@ namespace apkdiff {
 				signature = md.DecodeSignature<string, GenericContext> (new SignatureDecoder (), context);
 			} catch (BadImageFormatException) {
 				sigErr = true;
+				if (!warnedAboutSigErr) {
+					Program.Warning ("Exception in signature decoder. Some differences might be missing.");
+					warnedAboutSigErr = true;
+				}
 			}
 
 			sb.Append (sigErr ? "SIGERR" : signature.ReturnType);
