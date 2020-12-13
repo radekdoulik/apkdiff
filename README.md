@@ -192,3 +192,28 @@ Summary:
   +           0 Shared libraries 0.00% (of 11,856,152)
   +     106,496 Package size difference 0.51% (of 21,007,581)
 ```
+### Comparison with method body sizes example
+```
+apkdiff --bs -e dll$ before.apk after.apk
+Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
+  +         274 assemblies/Mono.Android.dll
+    Type Android.Runtime.AndroidTypeManager
+      -          42 Method System.Collections.Generic.IEnumerable`1<System.Type> GetTypesForSimpleReference (string)
+      -          33 Method public void RegisterNativeMembers (Java.Interop.JniType, System.Type, string)
+      +             Method System.Collections.Generic.IEnumerable`1<System.Type> <>n__0 (string)
+      -             Type <>c__DisplayClass11_0
+      -             Type <>c__DisplayClass11_1
+      +             Type <GetTypesForSimpleReference>d__2
+  -          67 assemblies/System.Private.CoreLib.dll
+    Type System.Array
+      -             Method public static void Fill (!!T[], !!T)
+  -         424 assemblies/System.Linq.dll
+    Type System.Linq.Enumerable
+      -             Method public static System.Collections.Generic.IEnumerable`1<!!TResult> Repeat (!!TResult, int)
+      -             Type RepeatIterator`1<TResult>
+    Type System.Linq.ThrowHelper
+      -             Method static void ThrowArgumentOutOfRangeException (System.Linq.ExceptionArgument)
+Summary:
+  -         217 Assemblies -0.03% (of 782,054)
+  +           0 Package size difference 0.00% (of 7,641,313)
+```
