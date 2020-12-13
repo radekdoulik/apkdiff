@@ -22,8 +22,12 @@ namespace apkdiff {
 
 		Regex regex;
 
-		public AssemblyDiff (string typesPattern = null)
+		bool CompareMethodBodies;
+
+		public AssemblyDiff (bool compareMethodBodies, string typesPattern = null)
 		{
+			CompareMethodBodies = compareMethodBodies;
+
 			if (typesPattern == null)
 				return;
 
@@ -215,7 +219,7 @@ namespace apkdiff {
 			var dict1 = GetCustomAttributes (reader1, cac1);
 			var dict2 = GetCustomAttributes (reader2, cac2);
 
-			CompareKeys (dict1.Keys, dict2.Keys, "CustomAttribute", padding);
+			CompareDictionaries<CustomAttribute> (dict1, dict2, "CustomAttribute", padding);
 		}
 
 		string GetFieldString (MetadataReader reader, TypeDefinition td, FieldDefinition fd)
@@ -347,7 +351,7 @@ namespace apkdiff {
 			var dict1 = GetFields (reader1, type1);
 			var dict2 = GetFields (reader2, type2);
 
-			CompareKeys (dict1.Keys, dict2.Keys, "Field", padding);
+			CompareDictionaries<FieldDefinition> (dict1, dict2, "Field", padding);
 		}
 
 		void CompareProperties (TypeDefinition type1, TypeDefinition type2, string padding)
@@ -355,7 +359,23 @@ namespace apkdiff {
 			var dict1 = GetProperties (reader1, type1);
 			var dict2 = GetProperties (reader2, type2);
 
-			CompareKeys (dict1.Keys, dict2.Keys, "Property", padding);
+			CompareDictionaries<PropertyDefinition> (dict1, dict2, "Property", padding);
+		}
+
+		void CompareMethod (string key, MethodDefinition md1, MethodDefinition md2, string label, string padding)
+		{
+			if (md1.RelativeVirtualAddress == 0 || md2.RelativeVirtualAddress == 0)
+				return;
+
+			var body1 = per1.GetMethodBody (md1.RelativeVirtualAddress);
+			var body2 = per2.GetMethodBody (md2.RelativeVirtualAddress);
+
+			if (body1.Size == body2.Size)
+				return;
+
+			var diff = body2.Size - body1.Size;
+			Program.Print.Invoke ();
+			ColorAPILine (padding, diff > 0 ? "+" : "-", diff > 0 ? ConsoleColor.Red : ConsoleColor.Green, label, ConsoleColor.Green, key, true, diff);
 		}
 
 		void CompareMethods (TypeDefinition type1, TypeDefinition type2, string padding)
@@ -363,7 +383,7 @@ namespace apkdiff {
 			var dict1 = GetMethods (reader1, type1);
 			var dict2 = GetMethods (reader2, type2);
 
-			CompareKeys (dict1.Keys, dict2.Keys, "Method", padding);
+			CompareDictionaries<MethodDefinition> (dict1, dict2, "Method", padding, CompareMethodBodies ? CompareMethod : (CompareDictionaryValues<MethodDefinition>)null);
 		}
 
 		string GetTypeFullname (MetadataReader reader, TypeDefinition td)
@@ -487,15 +507,19 @@ namespace apkdiff {
 			Console.WriteLine ($" {name}");
 		}
 
-		void CompareKeys (ICollection<string> col1, ICollection<string> col2, string label, string padding)
+		delegate void CompareDictionaryValues<T> (string key, T i1, T i2, string label, string padding);
+
+		void CompareDictionaries<T> (Dictionary<string, T> dict1, Dictionary<string, T> dict2, string label, string padding, CompareDictionaryValues<T> compare = null)
 		{
-			foreach (var key in col1) {
-				if (!col2.Contains (key))
+			foreach (var key in dict1.Keys) {
+				if (!dict2.ContainsKey (key))
 					ColorAPILine (padding, "-", ConsoleColor.Green, label, ConsoleColor.Green, key);
+				else if (compare != null)
+					compare (key, dict1 [key], dict2 [key], label, padding);
 			}
 
-			foreach (var key in col2) {
-				if (!col1.Contains (key))
+			foreach (var key in dict2.Keys) {
+				if (!dict1.ContainsKey (key))
 					ColorAPILine (padding, "+", ConsoleColor.Red, label, ConsoleColor.Green, key);
 			}
 		}

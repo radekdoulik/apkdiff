@@ -124,7 +124,7 @@ namespace apkdiff {
 		{
 			switch (extension) {
 				case ".dll":
-					return new AssemblyDiff ();
+					return new AssemblyDiff (ApkDiff.CompareMethodBodies);
 				case ".so":
 					return new SharedLibraryDiff ();
 				case ".dex":

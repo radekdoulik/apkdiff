@@ -8,6 +8,8 @@ namespace adiff
 {
 	class ADiff : Program
 	{
+		static bool CompareMethodBodies;
+
 		static ADiff ()
 		{
 			Name = nameof (adiff);
@@ -19,7 +21,7 @@ namespace adiff
 
 			var count = Program.Print.Push (new Action (() => Program.ColorWriteLine ($"Compare {path1} with {path2}", ConsoleColor.Yellow)));
 
-			var adiff = new AssemblyDiff (typesPattern);
+			var adiff = new AssemblyDiff (CompareMethodBodies, typesPattern);
 
 			adiff.Compare (path1, path2, "");
 			adiff.Summary ();
@@ -41,6 +43,9 @@ namespace adiff
 				"Copyright 2020 Microsoft Corporation",
 				"",
 				"Options:",
+				{ "bs",
+					"Compare methods body size",
+				  v => CompareMethodBodies = true },
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },

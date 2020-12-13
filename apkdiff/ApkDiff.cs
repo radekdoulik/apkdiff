@@ -9,6 +9,7 @@ namespace apkdiff
 	class ApkDiff : Program
 	{
 		public static string Comment;
+		public static bool CompareMethodBodies;
 		public static bool Flat;
 		public static bool SaveDescriptions;
 		public static string SaveDescription1, SaveDescription2;
@@ -59,6 +60,9 @@ namespace apkdiff
 				"Copyright 2020 Microsoft Corporation",
 				"",
 				"Options:",
+				{ "bs",
+					"Compare methods body size",
+				  v => CompareMethodBodies = true },
 				{ "c|comment=",
 					"Comment to be saved inside description file",
 				  v => Comment = v },
