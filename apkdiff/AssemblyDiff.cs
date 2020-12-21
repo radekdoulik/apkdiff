@@ -138,6 +138,7 @@ namespace apkdiff {
 					reader1 = per1.GetMetadataReader ();
 					reader2 = per2.GetMetadataReader ();
 
+					CompareMetadata (padding);
 					CompareManifestResources (padding);
 
 					var types1 = new Dictionary<string, TypeDefinition> (reader1.TypeDefinitions.Count);
@@ -158,6 +159,71 @@ namespace apkdiff {
 					CompareTypeDictionaries (types1, types2, padding, false);
 				}
 			}
+		}
+
+		void CompareMetadata (string padding)
+		{
+			var diff = reader2.MetadataLength - reader1.MetadataLength;
+			if (diff != 0) {
+				Program.Print.Invoke ();
+				Program.PrintDifference ("Metadata", diff, null, padding);
+			}
+
+			var sizes1 = GetMetadataStreamSizes (per1, reader1);
+			var sizes2 = GetMetadataStreamSizes (per2, reader2);
+
+			CompareSizes (sizes1, sizes2, "Stream", padding + "  ");
+		}
+
+		Dictionary<string, int> GetMetadataStreamSizes (PEReader per, MetadataReader reader)
+		{
+			var sizes = new Dictionary<string, int> ();
+			per.PEHeaders.TryGetDirectoryOffset (per.PEHeaders.CorHeader.MetadataDirectory, out int startOffset);
+
+			if (startOffset < 0)
+				return sizes;
+
+			var image = per.GetEntireImage ();
+			var br = image.GetReader (startOffset, per.PEHeaders.MetadataSize);
+			var signature = br.ReadInt32 ();
+			if (signature != 0x424A5342)
+				return sizes;
+
+			// read version string length
+			br.Offset = 12;
+			var versionLength = br.ReadInt32 ();
+
+			// read number of streams
+			br.Offset = 16 + versionLength + 2;
+			var nStreams = br.ReadInt16 ();
+
+			for (int i = 0; i < nStreams; i++) {
+				br.Offset += 4;
+
+				var sSize = br.ReadInt32 ();
+				var off = br.Offset;
+				int l;
+				for (l=0; l<32;) {
+					var b = br.ReadByte ();
+					l++;
+
+					if (b == 0)
+						break;
+				}
+
+				br.Offset = off;
+
+				var sName = br.ReadUTF8 (l - 1);
+				if (l < 32)
+					br.Offset++;
+
+				if ((l % 4) != 0)
+					br.Offset += (4 - (l % 4));
+
+				sizes [sName] = sSize;
+			}
+
+			return sizes;
 		}
 
 		string GetTypeName (MetadataReader reader, EntityHandle handle)
