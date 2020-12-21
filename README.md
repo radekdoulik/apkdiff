@@ -17,8 +17,13 @@ Compares APK/AAB packages content or APK/AAB package with content description
 Copyright 2020 Microsoft Corporation
 
 Options:
+      --bs                   Compare methods body size
   -c, --comment=VALUE        Comment to be saved inside description file
+  -e, --entry=PATTERN        Process only entries matching regex PATTERN
+  -f, --flat                 Display flat comparison of entries, without
+                               showing comparison of their content
   -h, --help, -?             Show this message and exit
+      --md                   Compare metadata sizes
       --test-apk-size-regression=BYTES
                              Check whether apk size increased more than BYTES
       --test-assembly-size-regression=BYTES
@@ -216,4 +221,31 @@ Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
 Summary:
   -         217 Assemblies -0.03% (of 782,054)
   +           0 Package size difference 0.00% (of 7,641,313)
+```
+### Comparison with metadata sizes example
+```
+Size difference in bytes ([*1] apk1 only, [*2] apk2 only):
+  +         274 assemblies/Mono.Android.dll
+    +         320 Metadata
+      +         164 Stream #~ (tables)
+        -          14 Table TypeDef
+        +          36 Table Field
+        +          84 Table MethodDef
+        +           6 Table Param
+        +          20 Table InterfaceImpl
+        -          18 Table MemberRef
+        +           6 Table CustomAttribute
+        +           4 Table PropertyMap
+        +          12 Table Property
+        +          12 Table MethodSemantics
+        +          36 Table MethodImpl
+        +           2 Table TypeSpec
+        -           4 Table NestedClass
+        -          16 Table MethodSpec
+      +         156 Stream #Strings
+    Type Android.Runtime.AndroidTypeManager
+      +             Method System.Collections.Generic.IEnumerable`1<System.Type> <>n__0 (string)
+      -             Type <>c__DisplayClass11_0
+      -             Type <>c__DisplayClass11_1
+      +             Type <GetTypesForSimpleReference>d__2
 ```
