@@ -8,6 +8,7 @@ namespace adiff
 {
 	class ADiff : Program
 	{
+		static bool CompareMetadata;
 		static bool CompareMethodBodies;
 
 		static ADiff ()
@@ -21,7 +22,7 @@ namespace adiff
 
 			var count = Program.Print.Push (new Action (() => Program.ColorWriteLine ($"Compare {path1} with {path2}", ConsoleColor.Yellow)));
 
-			var adiff = new AssemblyDiff (CompareMethodBodies, typesPattern);
+			var adiff = new AssemblyDiff (typesPattern) { ComapareMetadata = CompareMetadata, CompareMethodBodies = CompareMethodBodies };
 
 			adiff.Compare (path1, path2, "");
 			adiff.Summary ();
@@ -49,6 +50,9 @@ namespace adiff
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },
+				{ "md",
+					"Compare metadata sizes",
+				  v => CompareMetadata = true },
 				{ "t|type=",
 					"Process only types matching regex {PATTERN}",
 				  v => typesPattern = v },

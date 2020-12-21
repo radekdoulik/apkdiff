@@ -23,12 +23,11 @@ namespace apkdiff {
 
 		Regex regex;
 
-		bool CompareMethodBodies;
+		public bool ComapareMetadata { get; set; }
+		public bool CompareMethodBodies { get; set; }
 
-		public AssemblyDiff (bool compareMethodBodies, string typesPattern = null)
+		public AssemblyDiff (string typesPattern = null)
 		{
-			CompareMethodBodies = compareMethodBodies;
-
 			if (typesPattern == null)
 				return;
 
@@ -139,7 +138,9 @@ namespace apkdiff {
 					reader1 = per1.GetMetadataReader ();
 					reader2 = per2.GetMetadataReader ();
 
-					CompareMetadata (padding);
+					if (ComapareMetadata)
+						CompareMetadataStreams (padding);
+
 					CompareManifestResources (padding);
 
 					var types1 = new Dictionary<string, TypeDefinition> (reader1.TypeDefinitions.Count);
@@ -162,7 +163,7 @@ namespace apkdiff {
 			}
 		}
 
-		void CompareMetadata (string padding)
+		void CompareMetadataStreams (string padding)
 		{
 			var diff = reader2.MetadataLength - reader1.MetadataLength;
 			if (diff != 0) {

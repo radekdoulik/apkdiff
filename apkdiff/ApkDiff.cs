@@ -9,6 +9,7 @@ namespace apkdiff
 	class ApkDiff : Program
 	{
 		public static string Comment;
+		public static bool CompareMetadata;
 		public static bool CompareMethodBodies;
 		public static bool Flat;
 		public static bool SaveDescriptions;
@@ -75,6 +76,9 @@ namespace apkdiff
 				{ "h|help|?",
 					"Show this message and exit",
 				  v => help = v != null },
+				{ "md",
+					"Compare metadata sizes",
+				  v => CompareMetadata = true },
 				{ "test-apk-size-regression=",
 					"Check whether apk size increased more than {BYTES}",
 				  v => ApkRegressionThreshold = long.Parse (v) },
