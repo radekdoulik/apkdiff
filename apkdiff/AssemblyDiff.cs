@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -172,7 +173,36 @@ namespace apkdiff {
 			var sizes1 = GetMetadataStreamSizes (per1, reader1);
 			var sizes2 = GetMetadataStreamSizes (per2, reader2);
 
-			CompareSizes (sizes1, sizes2, "Stream", padding + "  ");
+			CompareDictionaries<int> (sizes1, sizes2, "Stream", padding + "  ", CompareStream);
+		}
+
+		string StreamKey (string key)
+		{
+			if (key != "#~")
+				return key;
+
+			return key + " (tables)";
+		}
+
+		void CompareStream (string key, int s1, int s2, string label, string padding)
+		{
+			if (s1 != s2)
+				ColorAPILine (padding, s1 > s2 ? "-" : "+", s1 > s2 ? ConsoleColor.Green : ConsoleColor.Red, label, ConsoleColor.Green, StreamKey (key), true, s2 - s1);
+
+			if (key != "#~")
+				return;
+
+			padding += "  ";
+
+			foreach (var io in Enum.GetValues (typeof (TableIndex))) {
+				var idx = (TableIndex) io;
+				var len1 = reader1.GetTableRowSize (idx) * reader1.GetTableRowCount (idx);
+				var len2 = reader2.GetTableRowSize (idx) * reader2.GetTableRowCount (idx);
+				if (len1 == len2)
+					continue;
+
+				ColorAPILine (padding, len1 > len2 ? "-" : "+", len1 > len2 ? ConsoleColor.Green : ConsoleColor.Red, "Table", ConsoleColor.Green, idx.ToString (), true, len2 - len1);
+			}
 		}
 
 		Dictionary<string, int> GetMetadataStreamSizes (PEReader per, MetadataReader reader)
