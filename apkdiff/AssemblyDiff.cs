@@ -21,6 +21,9 @@ namespace apkdiff {
 		FileInfo fileInfo1;
 		FileInfo fileInfo2;
 
+		int bodySizes1;
+		int bodySizes2;
+
 		Regex regex;
 
 		public bool ComapareMetadata { get; set; }
@@ -459,20 +462,20 @@ namespace apkdiff {
 			CompareDictionaries<PropertyDefinition> (dict1, dict2, "Property", padding);
 		}
 
-		void CompareMethod (string key, MethodDefinition md1, MethodDefinition md2, string label, string padding)
+		int GetMethodBodySize (MethodDefinition md, PEReader per)
 		{
-			if (md1.RelativeVirtualAddress == 0 || md2.RelativeVirtualAddress == 0)
-				return;
+			if (md.RelativeVirtualAddress == 0)
+				return 0;
 
-			var body1 = per1.GetMethodBody (md1.RelativeVirtualAddress);
-			var body2 = per2.GetMethodBody (md2.RelativeVirtualAddress);
+			return per.GetMethodBody (md.RelativeVirtualAddress).Size;
+		}
 
-			if (body1.Size == body2.Size)
-				return;
-
-			var diff = body2.Size - body1.Size;
-			Program.Print.Invoke ();
-			ColorAPILine (padding, diff > 0 ? "+" : "-", diff > 0 ? ConsoleColor.Red : ConsoleColor.Green, label, ConsoleColor.Green, key, true, diff);
+		void AddMethodBodySize (bool orig, int size)
+		{
+			if (orig)
+				bodySizes1 += size;
+			else
+				bodySizes2 += size;
 		}
 
 		void CompareMethods (TypeDefinition type1, TypeDefinition type2, string padding)
@@ -480,7 +483,7 @@ namespace apkdiff {
 			var dict1 = GetMethods (reader1, type1);
 			var dict2 = GetMethods (reader2, type2);
 
-			CompareDictionaries<MethodDefinition> (dict1, dict2, "Method", padding, CompareMethodBodies ? CompareMethod : (CompareDictionaryValues<MethodDefinition>)null);
+			CompareDictionariesSizes<MethodDefinition> (dict1, dict2, "Method", padding, CompareMethodBodies ? GetMethodBodySize : (GetSizeDictionaryValues<MethodDefinition>)null, CompareMethodBodies ? AddMethodBodySize : (AddSizeDictionaryValues)null);
 		}
 
 		string GetTypeFullname (MetadataReader reader, TypeDefinition td)
@@ -605,6 +608,53 @@ namespace apkdiff {
 		}
 
 		delegate void CompareDictionaryValues<T> (string key, T i1, T i2, string label, string padding);
+		delegate int GetSizeDictionaryValues<T> (T i, PEReader per);
+		delegate void AddSizeDictionaryValues (bool orig, int size);
+
+		void CompareDictionariesSizes<T> (Dictionary<string, T> dict1, Dictionary<string, T> dict2, string label, string padding, GetSizeDictionaryValues<T> getSize = null, AddSizeDictionaryValues addSize = null)
+		{
+			bool hasSize = getSize != null;
+			int size1, size2;
+			foreach (var key in dict1.Keys) {
+				if (hasSize) {
+					size1 = getSize (dict1 [key], per1);
+
+					if (addSize != null)
+						addSize (true, size1);
+				} else
+					size1 = 0;
+
+				if (!dict2.ContainsKey (key))
+					ColorAPILine (padding, "-", ConsoleColor.Green, label, ConsoleColor.Green, key, hasSize, size1);
+				else if (hasSize) {
+						size2 = getSize (dict2 [key], per2);
+
+						if (addSize != null)
+							addSize (false, size2);
+
+					var diff = size2 - size1;
+					if (diff == 0)
+						continue;
+
+					Program.Print.Invoke ();
+					ColorAPILine (padding, diff > 0 ? "+" : "-", diff > 0 ? ConsoleColor.Red : ConsoleColor.Green, label, ConsoleColor.Green, key, true, diff);
+				}
+			}
+
+			foreach (var key in dict2.Keys) {
+				if (!dict1.ContainsKey (key)) {
+					if (hasSize) {
+						size2 = getSize (dict2 [key], per2);
+
+						if (addSize != null)
+							addSize (false, size2);
+					} else
+						size2 = 0;
+
+					ColorAPILine (padding, "+", ConsoleColor.Red, label, ConsoleColor.Green, key, hasSize, size2);
+				}
+			}
+		}
 
 		void CompareDictionaries<T> (Dictionary<string, T> dict1, Dictionary<string, T> dict2, string label, string padding, CompareDictionaryValues<T> compare = null)
 		{
@@ -645,6 +695,10 @@ namespace apkdiff {
 			Program.ColorWriteLine ("Summary:", ConsoleColor.Green);
 			Program.PrintDifference ("File size", fileInfo2.Length - fileInfo1.Length, fileInfo1.Length);
 			Program.PrintDifference ("Metadata size", reader2.MetadataLength - reader1.MetadataLength, reader1.MetadataLength);
+
+			if (CompareMethodBodies)
+				Program.PrintDifference ("Method bodies size", bodySizes2 - bodySizes1, bodySizes1);
+
 			Program.PrintDifference ("Types count", reader2.TypeDefinitions.Count - reader1.TypeDefinitions.Count);
 		}
 	}
