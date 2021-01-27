@@ -32,6 +32,8 @@ namespace apkdiff {
 
 		Regex entriesRegex;
 
+		const string UncompressedAssembliesText = "Uncompressed assemblies";
+
 		public static ApkDescription Load (string path, string saveDescriptionPath = null)
 		{
 			if (!File.Exists (path)) {
@@ -143,15 +145,18 @@ namespace apkdiff {
 				return null;
 			}
 
-			var diffType = entryDiff.Name;
+			AddToTotalDifferencesDirect (entryDiff.Name, diff, total);
+			return entryDiff;
+		}
+
+		void AddToTotalDifferencesDirect (string diffType, long diff = 0, long total = 0)
+		{
 			if (!totalDifferences.ContainsKey (diffType))
 				totalDifferences.Add (diffType, (diff, total));
 			else {
 				var info = totalDifferences [diffType];
 				totalDifferences [diffType] = (info.Difference + diff, info.OriginalTotal + total);
 			}
-
-			return entryDiff;
 		}
 
 		bool ShouldCompareEntry (string entry)
@@ -223,8 +228,16 @@ namespace apkdiff {
 			if (Program.Verbose)
 				Program.ColorWriteLine ($"  apk1: {PackageSize,12}  {PackagePath}\n  apk2: {other.PackageSize,12}  {other.PackagePath}", ConsoleColor.Gray);
 
-			foreach (var total in totalDifferences)
+			foreach (var total in totalDifferences) {
+				if (total.Key == UncompressedAssembliesText
+					&& totalDifferences.ContainsKey ("Assemblies")) {
+					var (difference, originalTotal) = totalDifferences ["Assemblies"];
+					if (originalTotal == total.Value.OriginalTotal && difference == total.Value.Difference)
+						continue;
+				}
+
 				Program.PrintDifference (total.Key, total.Value.Difference, total.Value.OriginalTotal);
+			}
 
 			Program.PrintDifference ("Package size difference", other.PackageSize - PackageSize, PackageSize);
 		}
@@ -250,6 +263,11 @@ namespace apkdiff {
 			}
 
 			diff.Compare (Path.Combine (tmpDir, entry.Key), Path.Combine (tmpDirOther, other.Key), padding);
+
+			if (diff is AssemblyDiff) {
+				var adiff = diff as AssemblyDiff;
+				AddToTotalDifferencesDirect (UncompressedAssembliesText, adiff.Length2 - adiff.Length1, adiff.Length1);
+			}
 
 			Directory.Delete (tmpDir, true);
 			Directory.Delete (tmpDirOther, true);

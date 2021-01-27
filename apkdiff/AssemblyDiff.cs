@@ -26,6 +26,9 @@ namespace apkdiff {
 
 		Regex regex;
 
+		public long Length1 { get; private set; }
+		public long Length2 { get; private set; }
+
 		public bool ComapareMetadata { get; set; }
 		public bool CompareMethodBodies { get; set; }
 
@@ -50,7 +53,7 @@ namespace apkdiff {
 		const uint CompressedDataMagic = 0x5A4C4158; // 'XALZ', little-endian
 		static readonly ArrayPool<byte> bytePool = ArrayPool<byte>.Shared;
 
-		PEReader GetPEReaderCompressedAssembly (string filename, BinaryReader binReader, int length)
+		(PEReader reader, long length) GetPEReaderCompressedAssembly (string filename, BinaryReader binReader, int length)
 		{
 			var fileInfo = new FileInfo (filename);
 			var compressedData = bytePool.Rent ((int)(fileInfo.Length - 12));
@@ -60,10 +63,10 @@ namespace apkdiff {
 			LZ4Codec.Decode (compressedData, decodedData);
 			bytePool.Return (compressedData);
 
-			return new PEReader (new MemoryStream (decodedData));
+			return (new PEReader (new MemoryStream (decodedData)), decodedData.LongLength);
 		}
 
-		PEReader GetPEReader (string filename, string padding)
+		(PEReader reader, long length) GetPEReader (string filename, string padding)
 		{
 			FileStream fileStream = null;
 			try {
@@ -86,7 +89,7 @@ namespace apkdiff {
 
 				binReader.BaseStream.Seek (0, SeekOrigin.Begin);
 
-				return new PEReader (binReader.BaseStream);
+				return (new PEReader (binReader.BaseStream), binReader.BaseStream.Length);
 
 			} catch (Exception e) {
 				if (fileStream != null)
@@ -136,8 +139,11 @@ namespace apkdiff {
 			fileInfo1 = new FileInfo (file);
 			fileInfo2 = new FileInfo (other);
 
-			using (per1 = GetPEReader (file, padding)) {
-				using (per2 = GetPEReader (other, padding)) {
+			(per1, Length1) = GetPEReader (file, padding);
+			(per2, Length2) = GetPEReader (other, padding);
+
+			using (per1) {
+				using (per2) {
 					reader1 = per1.GetMetadataReader ();
 					reader2 = per2.GetMetadataReader ();
 
@@ -694,6 +700,10 @@ namespace apkdiff {
 		{
 			Program.ColorWriteLine ("Summary:", ConsoleColor.Green);
 			Program.PrintDifference ("File size", fileInfo2.Length - fileInfo1.Length, fileInfo1.Length);
+
+			if (Length1 != fileInfo1.Length || Length2 != fileInfo2.Length)
+				Program.PrintDifference ("Uncompressed size", Length2 - Length1, Length1);
+
 			Program.PrintDifference ("Metadata size", reader2.MetadataLength - reader1.MetadataLength, reader1.MetadataLength);
 
 			if (CompareMethodBodies)
