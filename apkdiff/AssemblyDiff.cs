@@ -66,17 +66,25 @@ namespace apkdiff {
 			return (new PEReader (new MemoryStream (decodedData)), (long)length);
 		}
 
+		internal static (bool isCompressed, UInt32 length, BinaryReader reader) GetUncompressedSize (Stream stream)
+		{
+			try {
+				var reader = new BinaryReader (stream);
+				var header = reader.ReadUInt32 ();
+				reader.ReadUInt32 ();
+				return (header == CompressedDataMagic, reader.ReadUInt32 (), reader);
+			} catch {
+				return (false, 0, null);
+			}
+		}
+
 		(PEReader reader, long length) GetPEReader (string filename, string padding)
 		{
 			FileStream fileStream = null;
 			try {
 				fileStream = File.OpenRead (filename);
-
-				var binReader = new BinaryReader (fileStream);
-				var header = binReader.ReadUInt32 ();
-				var descriptorIndex = binReader.ReadUInt32 ();
-				var length = binReader.ReadUInt32 ();
-				if (header == CompressedDataMagic) {
+				(var isCompressed, var length, var binReader) = GetUncompressedSize (fileStream);
+				if (isCompressed) {
 					if (Program.Verbose)
 						Program.ColorWriteLine ($"{padding}LZ4 compression detected for '{filename}'", ConsoleColor.Yellow);
 

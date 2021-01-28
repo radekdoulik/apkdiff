@@ -219,6 +219,20 @@ namespace apkdiff {
 
 					if (!flat && comparingApks && !single)
 						CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
+					else if (entryDiff is AssemblyDiff) {
+						var adiff = entryDiff as AssemblyDiff;
+						long len1 = 0;
+						long len2 = 0;
+
+						if (Entries.ContainsKey (diff.Key)) {
+							len1 = GetUncompressedAssemblySize (diff.Key);
+						}
+						if (other.Entries.ContainsKey (diff.Key)) {
+							len2 = other.GetUncompressedAssemblySize (diff.Key);
+						}
+
+						AddToTotalDifferencesDirect (UncompressedAssembliesText, len2 - len1, len1);
+					}
 				}
 
 				Program.Print.Pop (count);
@@ -240,6 +254,18 @@ namespace apkdiff {
 			}
 
 			Program.PrintDifference ("Package size difference", other.PackageSize - PackageSize, PackageSize);
+		}
+
+		long GetUncompressedAssemblySize (string key)
+		{
+			var zipEntry = Archive.ReadEntry (key, true);
+			Stream stream = new MemoryStream ((int)zipEntry.Size);
+			zipEntry.Extract (stream);
+			stream.Seek (0, SeekOrigin.Begin);
+
+			(var isCompressed, var length, _) = AssemblyDiff.GetUncompressedSize (stream);
+
+			return isCompressed ? length : (long) zipEntry.Size;
 		}
 
 		void CompareEntries (KeyValuePair<string, FileProperties> entry, KeyValuePair<string, FileProperties> other, ApkDescription otherApk, EntryDiff diff)
