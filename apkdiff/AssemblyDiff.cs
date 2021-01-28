@@ -63,7 +63,7 @@ namespace apkdiff {
 			LZ4Codec.Decode (compressedData, decodedData);
 			bytePool.Return (compressedData);
 
-			return (new PEReader (new MemoryStream (decodedData)), decodedData.LongLength);
+			return (new PEReader (new MemoryStream (decodedData)), (long)length);
 		}
 
 		(PEReader reader, long length) GetPEReader (string filename, string padding)
