@@ -212,9 +212,14 @@ namespace apkdiff {
 
 				EntryDiff entryDiff = AddToTotalDifferences (diff.Key, diff: diff.Value);
 				if (entryDiff != null) {
-					if (ApkDiff.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff && diff.Value > ApkDiff.AssemblyRegressionThreshold) {
-						Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
-						ApkDiff.RegressionCount++;
+					if (ApkDiff.AssemblyRegressionThreshold != 0 && entryDiff is AssemblyDiff) {
+						if (diff.Value > ApkDiff.AssemblyRegressionThreshold) {
+							Program.Error ($"Assembly '{diff.Key}' size increase {diff.Value:#,0} is {diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
+							ApkDiff.RegressionCount++;
+						} else if (ApkDiff.DecreaseIsRegression && -diff.Value > ApkDiff.AssemblyRegressionThreshold) {
+							Program.Error ($"Assembly '{diff.Key}' size decrease {-diff.Value:#,0} is {-diff.Value - ApkDiff.AssemblyRegressionThreshold:#,0} bytes more than the threshold {ApkDiff.AssemblyRegressionThreshold:#,0}.");
+							ApkDiff.RegressionCount++;
+						}
 					}
 
 					if (!flat && comparingApks && !single)

@@ -17,6 +17,7 @@ namespace apkdiff
 
 		public static long AssemblyRegressionThreshold;
 		public static long ApkRegressionThreshold;
+		public static bool DecreaseIsRegression;
 		public static int RegressionCount;
 
 		static ApkDiff ()
@@ -35,9 +36,14 @@ namespace apkdiff
 
 				desc1.Compare (desc2, entriesPattern, Flat);
 
-				if (ApkRegressionThreshold != 0 && (desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
-					Error ($"PackageSize increase {desc2.PackageSize - desc1.PackageSize:#,0} is {desc2.PackageSize - desc1.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
-					RegressionCount++;
+				if (ApkRegressionThreshold != 0) {
+					if ((desc2.PackageSize - desc1.PackageSize) > ApkRegressionThreshold) {
+						Error ($"PackageSize increase {desc2.PackageSize - desc1.PackageSize:#,0} is {desc2.PackageSize - desc1.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
+						RegressionCount++;
+					} else if (DecreaseIsRegression && (desc1.PackageSize - desc2.PackageSize) > ApkRegressionThreshold) {
+						Error ($"PackageSize decrease {desc1.PackageSize - desc2.PackageSize:#,0} is {desc1.PackageSize - desc2.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
+						RegressionCount++;
+					}
 				}
 			}
 
@@ -67,6 +73,9 @@ namespace apkdiff
 				{ "c|comment=",
 					"Comment to be saved inside description file",
 				  v => Comment = v },
+				{ "descrease-is-regression",
+					"Report also size descrease as regression",
+				  v => DecreaseIsRegression = true },
 				{ "e|entry=",
 					"Process only entries matching regex {PATTERN}",
 				  v => entriesPattern = v },
