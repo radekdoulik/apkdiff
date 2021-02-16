@@ -19,6 +19,8 @@ Copyright 2020 Microsoft Corporation
 Options:
       --bs                   Compare methods body size
   -c, --comment=VALUE        Comment to be saved inside description file
+      --descrease-is-regression
+                             Report also size descrease as regression
   -e, --entry=PATTERN        Process only entries matching regex PATTERN
   -f, --flat                 Display flat comparison of entries, without
                                showing comparison of their content
