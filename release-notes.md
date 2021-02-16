@@ -1,3 +1,13 @@
+### Release new version 0.0.10
+
+Changes:
+
+ * with bs option enabled, print body size differences.
+   also show body sizes summary
+ * show uncompressed assembly sizes in summary
+ * new descrease-is-regression option to report size
+   decrease(s) larger than threshold as regression
+
 ### Release new version 0.0.9
 
 Changes:
