@@ -229,14 +229,17 @@ namespace apkdiff {
 						long len1 = 0;
 						long len2 = 0;
 
-						if (Entries.ContainsKey (diff.Key)) {
-							len1 = GetUncompressedAssemblySize (diff.Key);
-						}
-						if (other.Entries.ContainsKey (diff.Key)) {
-							len2 = other.GetUncompressedAssemblySize (diff.Key);
-						}
+						if (Archive != null && other.Archive != null) {
+							if (Entries.ContainsKey (diff.Key)) {
+								len1 = GetUncompressedAssemblySize (diff.Key);
+							}
 
-						AddToTotalDifferencesDirect (UncompressedAssembliesText, len2 - len1, len1);
+							if (other.Entries.ContainsKey (diff.Key)) {
+								len2 = other.GetUncompressedAssemblySize (diff.Key);
+							}
+
+							AddToTotalDifferencesDirect (UncompressedAssembliesText, len2 - len1, len1);
+						}
 					}
 				}
 
