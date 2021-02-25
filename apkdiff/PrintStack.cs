@@ -7,6 +7,7 @@ namespace apkdiff
 	class PrintStack
 	{
 		List<Action> headers = new List<Action> ();
+		public bool Quiet { get; set; }
 
 		public int Push (Action action)
 		{
@@ -23,8 +24,9 @@ namespace apkdiff
 
 		public void Invoke ()
 		{
-			foreach (var d in headers)
-				d.DynamicInvoke ();
+			if (!Quiet)
+				foreach (var d in headers)
+					d.DynamicInvoke ();
 
 			headers.Clear ();
 		}

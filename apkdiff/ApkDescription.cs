@@ -173,7 +173,10 @@ namespace apkdiff {
 
 			entriesRegex = string.IsNullOrEmpty (entriesPattern) ? null : new Regex (entriesPattern);
 
-			Program.ColorWriteLine ("Size difference in bytes ([*1] apk1 only, [*2] apk2 only):", ConsoleColor.Yellow);
+			if (!Program.SummaryOnly)
+				Program.ColorWriteLine ("Size difference in bytes ([*1] apk1 only, [*2] apk2 only):", ConsoleColor.Yellow);
+			else
+				Program.Print.Quiet = true;
 
 			foreach (var entry in Entries) {
 				var key = entry.Key;
@@ -207,7 +210,7 @@ namespace apkdiff {
 				int count = -1;
 				if (diff.Value == 0)
 					count = Program.Print.Push (pa);
-				else
+				else if (!Program.SummaryOnly)
 					pa.DynamicInvoke ();
 
 				EntryDiff entryDiff = AddToTotalDifferences (diff.Key, diff: diff.Value);
@@ -245,6 +248,9 @@ namespace apkdiff {
 
 				Program.Print.Pop (count);
 			}
+
+			if (Program.SummaryOnly)
+				Program.Print.Quiet = false;
 
 			Program.ColorWriteLine ("Summary:", ConsoleColor.Green);
 			if (Program.Verbose)

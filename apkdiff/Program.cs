@@ -5,6 +5,7 @@ using static System.Console;
 
 namespace apkdiff {
 	class Program {
+		public static bool SummaryOnly;
 		public static bool Verbose;
 		protected static string Name;
 
@@ -60,7 +61,5 @@ namespace apkdiff {
 			PrintDifferenceStart (key, diff, comment, padding);
 			Console.WriteLine ();
 		}
-
-
 	}
 }
