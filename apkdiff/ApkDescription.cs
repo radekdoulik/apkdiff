@@ -71,6 +71,11 @@ namespace apkdiff {
 			PackageSize = new System.IO.FileInfo (path).Length;
 			PackagePath = path;
 
+			if (Program.Verbose) {
+				Program.ColorWriteLine ($"          Size |   Compressed | Entry", ConsoleColor.Gray);
+				Program.ColorWriteLine ($"  -------------+--------------+----------------", ConsoleColor.Gray);
+			}
+
 			foreach (var entry in Archive) {
 				var name = entry.FullName;
 
@@ -82,7 +87,7 @@ namespace apkdiff {
 				Entries [name] = new FileProperties { Size = (long)entry.Size };
 
 				if (Program.Verbose)
-					Program.ColorWriteLine ($"  {entry.Size,12} {name}", ConsoleColor.Gray);
+					Program.ColorWriteLine ($"  {entry.Size,12} | {entry.CompressedSize,12} | {name}", ConsoleColor.Gray);
 			}
 
 			if (ApkDiff.SaveDescriptions) {
