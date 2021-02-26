@@ -86,7 +86,7 @@ namespace apkdiff {
 				(var isCompressed, var length, var binReader) = GetUncompressedSize (fileStream);
 				if (isCompressed) {
 					if (Program.Verbose)
-						Program.ColorWriteLine ($"{padding}LZ4 compression detected for '{filename}'", ConsoleColor.Yellow);
+						Program.ColorWriteLine ($"{padding}LZ4 compression detected for '{filename}', uncompressed size: {length}", ConsoleColor.Yellow);
 
 					var reader = GetPEReaderCompressedAssembly (filename, binReader, (int)length);
 					binReader.Dispose ();
