@@ -98,7 +98,7 @@ namespace apkdiff {
 				if (cols.Length != 4)
 					continue;
 
-				symbols [cols [3]] = new SymbolInfo () { Size = int.Parse (cols [1], System.Globalization.NumberStyles.HexNumber) };
+				symbols [cols [3].Trim ()] = new SymbolInfo () { Size = int.Parse (cols [1], System.Globalization.NumberStyles.HexNumber) };
 			}
 
 			return symbols;
