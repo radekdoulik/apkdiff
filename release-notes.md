@@ -1,3 +1,12 @@
+### Release new version 0.0.12
+
+Changes:
+
+ * fix lines with symbol names
+ * new --summary-only option
+ * show entries compressed size in verbose mode
+ * show assemblies uncompressed size in verbose mode
+
 ### Release new version 0.0.11
 
 Changes:
