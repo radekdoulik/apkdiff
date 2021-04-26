@@ -230,6 +230,15 @@ namespace apkdiff {
 						}
 					}
 
+					if (ApkDiff.FileRegressionThresholdPercentage != 0) {
+						double originalValue = other.Entries[diff.Key].Size;
+						var change = diff.Value / originalValue * 100;
+						if (change > ApkDiff.FileRegressionThresholdPercentage || (ApkDiff.DecreaseIsRegression && change < -ApkDiff.FileRegressionThresholdPercentage)) {
+							Program.Error ($"File '{diff.Key}' has changed by {diff.Value:#,0} bytes ({change:#,0.00} %). This exceeds the threshold of {ApkDiff.FileRegressionThresholdPercentage:#,0.00} %.");
+							ApkDiff.RegressionCount++;
+						}
+					}
+
 					if (!flat && comparingApks && !single)
 						CompareEntries (new KeyValuePair<string, FileProperties> (diff.Key, Entries [diff.Key]), new KeyValuePair<string, FileProperties> (diff.Key, other.Entries [diff.Key]), other, entryDiff);
 					else if (entryDiff is AssemblyDiff) {

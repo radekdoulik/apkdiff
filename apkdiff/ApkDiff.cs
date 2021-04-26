@@ -19,6 +19,8 @@ namespace apkdiff
 		public static long ApkRegressionThreshold;
 		public static bool DecreaseIsRegression;
 		public static int RegressionCount;
+		public static double ApkRegressionThresholdPercentage;
+		public static double FileRegressionThresholdPercentage;
 
 		static ApkDiff ()
 		{
@@ -42,6 +44,14 @@ namespace apkdiff
 						RegressionCount++;
 					} else if (DecreaseIsRegression && (desc1.PackageSize - desc2.PackageSize) > ApkRegressionThreshold) {
 						Error ($"PackageSize decrease {desc1.PackageSize - desc2.PackageSize:#,0} is {desc1.PackageSize - desc2.PackageSize - ApkRegressionThreshold:#,0} bytes more than the threshold {ApkRegressionThreshold:#,0}. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
+						RegressionCount++;
+					}
+				}
+				if (ApkRegressionThresholdPercentage != 0) {
+					double diff = desc2.PackageSize - desc1.PackageSize;
+					var change =  diff / desc1.PackageSize * 100;
+					if (change > ApkRegressionThresholdPercentage || (DecreaseIsRegression && change < -ApkRegressionThresholdPercentage)) {
+						Error ($"PackageSize difference {change:#,0.00} % exceeds the threshold of {ApkRegressionThresholdPercentage:#,0.00} %. apk1 size: {desc1.PackageSize:#,0} bytes, apk2 size: {desc2.PackageSize:#,0} bytes.");
 						RegressionCount++;
 					}
 				}
@@ -94,6 +104,12 @@ namespace apkdiff
 				{ "test-assembly-size-regression=",
 					"Check whether any assembly size increased more than {BYTES}",
 				  v => AssemblyRegressionThreshold = long.Parse (v) },
+				{ "test-apk-percentage-regression=",
+					"Check whether the apk size increased by more than {PERCENT}",
+				  v => ApkRegressionThresholdPercentage = double.Parse (v) },
+				{ "test-content-percentage-regression=",
+					"Check whether any individual file size increased by more than {PERCENT}",
+				  v => FileRegressionThresholdPercentage = double.Parse (v) },
 				{ "s|save-descriptions",
 					"Save .[apk|aab]desc description files next to the package(s) or to the specified path",
 				  v => SaveDescriptions = true },
