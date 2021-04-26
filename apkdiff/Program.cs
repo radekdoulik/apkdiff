@@ -5,7 +5,9 @@ using static System.Console;
 
 namespace apkdiff {
 	class Program {
+#pragma warning disable CS0649
 		public static bool SummaryOnly;
+#pragma warning restore CS0649
 		public static bool Verbose;
 		protected static string Name;
 
