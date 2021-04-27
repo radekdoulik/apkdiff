@@ -1,3 +1,9 @@
+### Release new version 0.0.13
+
+Changes:
+
+ * add percentage based regression checks
+
 ### Release new version 0.0.12
 
 Changes:
