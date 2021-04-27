@@ -31,6 +31,12 @@ Options:
       --test-assembly-size-regression=BYTES
                              Check whether any assembly size increased more
                                than BYTES
+      --test-apk-percentage-regression=PERCENT
+                             Check whether the apk size increased by more than
+                               PERCENT
+      --test-content-percentage-regression=PERCENT
+                             Check whether any individual file size increased
+                               by more than PERCENT
   -s, --save-descriptions    Save .[apk|aab]desc description files next to the
                                package(s) or to the specified path
       --save-description-1=PATH
@@ -39,6 +45,7 @@ Options:
       --save-description-2=PATH
                              Save .[apk|aab]desc description for second package
                                to PATH
+      --summary-only         Output only summary information
   -v, --verbose              Output information about progress during the run
                                of the tool
 ```
