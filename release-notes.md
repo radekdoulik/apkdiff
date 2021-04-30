@@ -1,3 +1,9 @@
+### Release new version 0.0.14
+
+Changes:
+
+ * sort entries in apkdesc files
+
 ### Release new version 0.0.13
 
 Changes:
