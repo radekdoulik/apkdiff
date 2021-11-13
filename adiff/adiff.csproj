@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Company>Microsoft Corporation</Company>
     <Copyright>2020 Microsoft Corporation</Copyright>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Version>$(ProductVersion)</Version>
     <Authors>Radek Doulik</Authors>
     <OutputType>Exe</OutputType>
