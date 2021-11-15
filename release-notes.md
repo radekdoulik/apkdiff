@@ -1,3 +1,9 @@
+### Release new version 0.0.15
+
+Changes:
+
+ * allow apkdiff to run on net6.0
+
 ### Release new version 0.0.14
 
 Changes:
