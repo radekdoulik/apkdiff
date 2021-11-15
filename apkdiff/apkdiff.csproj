@@ -3,6 +3,7 @@
     <Company>Microsoft Corporation</Company>
     <Copyright>2020 Microsoft Corporation</Copyright>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RollForward>Major</RollForward>
     <Version>$(ProductVersion)</Version>
     <Authors>Radek Doulik</Authors>
     <OutputType>Exe</OutputType>
