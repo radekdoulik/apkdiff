@@ -1,3 +1,9 @@
+### Release new version 0.0.16
+
+Changes:
+
+ * add keep-uncompressed-assemblies option
+
 ### Release new version 0.0.15
 
 Changes:
