@@ -53,7 +53,7 @@ namespace apkdiff {
 		const uint CompressedDataMagic = 0x5A4C4158; // 'XALZ', little-endian
 		static readonly ArrayPool<byte> bytePool = ArrayPool<byte>.Shared;
 
-		(PEReader reader, long length) GetPEReaderCompressedAssembly (string filename, BinaryReader binReader, int length)
+		(PEReader reader, long length) GetPEReaderCompressedAssembly (string filename, BinaryReader binReader, int length, string padding)
 		{
 			var fileInfo = new FileInfo (filename);
 			var compressedData = bytePool.Rent ((int)(fileInfo.Length - 12));
@@ -62,6 +62,13 @@ namespace apkdiff {
 			var decodedData = bytePool.Rent (length);
 			LZ4Codec.Decode (compressedData, decodedData);
 			bytePool.Return (compressedData);
+
+			if (Program.KeepUncompressedAssemblies)
+            {
+				var tempFile = Path.Combine(Path.GetTempPath(), $"{Path.GetRandomFileName()}-{Path.GetFileName (filename)}");
+				File.WriteAllBytes(tempFile, decodedData);
+				Program.ColorWriteLine($"{padding}Extracted '{filename}' to temporary {tempFile}, it will not be deleted before exit.", ConsoleColor.Gray);
+			}
 
 			return (new PEReader (new MemoryStream (decodedData)), (long)length);
 		}
@@ -88,7 +95,7 @@ namespace apkdiff {
 					if (Program.Verbose)
 						Program.ColorWriteLine ($"{padding}LZ4 compression detected for '{filename}', uncompressed size: {length}", ConsoleColor.Yellow);
 
-					var reader = GetPEReaderCompressedAssembly (filename, binReader, (int)length);
+					var reader = GetPEReaderCompressedAssembly (filename, binReader, (int)length, padding);
 					binReader.Dispose ();
 					fileStream.Dispose ();
 

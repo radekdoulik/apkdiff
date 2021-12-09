@@ -9,6 +9,7 @@ namespace apkdiff {
 		public static bool SummaryOnly;
 #pragma warning restore CS0649
 		public static bool Verbose;
+		public static bool KeepUncompressedAssemblies;
 		protected static string Name;
 
 		public static PrintStack Print { get; private set; }
