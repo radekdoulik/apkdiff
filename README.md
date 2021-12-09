@@ -25,6 +25,8 @@ Options:
   -f, --flat                 Display flat comparison of entries, without
                                showing comparison of their content
   -h, --help, -?             Show this message and exit
+      --keep-uncompressed-assemblies
+                             Save LZ4 uncompressed assemblies to temporary files
       --md                   Compare metadata sizes
       --test-apk-size-regression=BYTES
                              Check whether apk size increased more than BYTES

@@ -12,6 +12,8 @@
     <ToolCommandName>apkdiff</ToolCommandName>
     <PackageOutputPath>nupkg</PackageOutputPath>
     <PackageDescription>A tool to compare Android packages</PackageDescription>
+    <PackageReadmeFile>../README.md</PackageReadmeFile>
+    <PackageLicenseFile>../LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
     <LibZipSharpVersion>1.0.20</LibZipSharpVersion>
   </PropertyGroup>
