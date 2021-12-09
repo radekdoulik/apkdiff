@@ -12,8 +12,8 @@
     <ToolCommandName>apkdiff</ToolCommandName>
     <PackageOutputPath>nupkg</PackageOutputPath>
     <PackageDescription>A tool to compare Android packages</PackageDescription>
-    <PackageReadmeFile>../README.md</PackageReadmeFile>
-    <PackageLicenseFile>../LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
     <LibZipSharpVersion>1.0.20</LibZipSharpVersion>
   </PropertyGroup>
@@ -24,6 +24,8 @@
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageReference Include="Xamarin.LibZipSharp" Version="$(LibZipSharpVersion)" />
     <PackageReference Include="System.Reflection.Metadata" Version="5.0.0" />
+    <None Include="$(MSBuildThisFileDirectory)..\README.md" Pack="true" PackagePath="\"/>
+    <None Include="$(MSBuildThisFileDirectory)..\LICENSE" Pack="true" PackagePath="\"/>
   </ItemGroup>
   <Import Project="packages\Xamarin.LibZipSharp.$(LibZipSharpVersion)\build\Xamarin.LibZipSharp.targets" Condition="Exists('packages\Xamarin.LibZipSharp.$(LibZipSharpVersion)\build\Xamarin.LibZipSharp.targets')" />
 </Project>
