@@ -2,12 +2,12 @@
   <PropertyGroup>
     <Company>Microsoft Corporation</Company>
     <Copyright>2020 Microsoft Corporation</Copyright>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RollForward>Major</RollForward>
     <Version>$(ProductVersion)</Version>
     <Authors>Radek Doulik</Authors>
     <OutputType>Exe</OutputType>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>apkdiff</ToolCommandName>
     <PackageOutputPath>nupkg</PackageOutputPath>
@@ -15,10 +15,10 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/radekdoulik/apkdiff</RepositoryUrl>
-    <LibZipSharpVersion>1.0.20</LibZipSharpVersion>
+    <LibZipSharpVersion>3.3.0</LibZipSharpVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="K4os.Compression.LZ4" Version="1.1.11" />
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.3.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Mono.Options" Version="6.6.0.161" />
     <PackageReference Include="Mono.Posix.NETStandard" Version="1.0.0" />
